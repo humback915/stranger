@@ -1,0 +1,141 @@
+"use client";
+
+import { PLACE_CATEGORY_LABELS } from "@/lib/constants/places";
+import { PROP_CATEGORY_LABELS } from "@/lib/constants/props";
+import type { PlaceCategory } from "@/lib/constants/places";
+import type { PropCategory } from "@/lib/constants/props";
+import DepartureConfirmation from "./DepartureConfirmation";
+
+interface MissionCardProps {
+  mission: {
+    id: number;
+    place_name: string;
+    place_address: string;
+    place_category: string;
+    user_a_prop_category: string;
+    user_a_prop_name: string;
+    user_a_prop_description: string | null;
+    user_b_prop_category: string;
+    user_b_prop_name: string;
+    user_b_prop_description: string | null;
+    user_a_action: string | null;
+    user_b_action: string | null;
+    meeting_date: string;
+    meeting_time: string;
+    user_a_departure_confirmed: boolean;
+    user_b_departure_confirmed: boolean;
+    status: string;
+  };
+  role: "user_a" | "user_b";
+  partnerNickname?: string;
+}
+
+export default function MissionCard({ mission, role, partnerNickname }: MissionCardProps) {
+  const isUserA = role === "user_a";
+  const myPropCategory = isUserA
+    ? mission.user_a_prop_category
+    : mission.user_b_prop_category;
+  const myPropName = isUserA
+    ? mission.user_a_prop_name
+    : mission.user_b_prop_name;
+  const myPropDesc = isUserA
+    ? mission.user_a_prop_description
+    : mission.user_b_prop_description;
+  const myAction = isUserA
+    ? mission.user_a_action
+    : mission.user_b_action;
+  const myConfirmed = isUserA
+    ? mission.user_a_departure_confirmed
+    : mission.user_b_departure_confirmed;
+  const partnerConfirmed = isUserA
+    ? mission.user_b_departure_confirmed
+    : mission.user_a_departure_confirmed;
+
+  const formattedDate = new Date(mission.meeting_date).toLocaleDateString(
+    "ko-KR",
+    { month: "long", day: "numeric", weekday: "short" }
+  );
+  const formattedTime = mission.meeting_time.slice(0, 5); // HH:MM
+
+  return (
+    <div className="space-y-4 rounded-2xl bg-stranger-dark p-5">
+      {/* 장소 정보 */}
+      <div>
+        <div className="mb-1 flex items-center gap-2">
+          <span className="rounded-md bg-stranger-accent/20 px-2 py-0.5 text-xs text-stranger-accent">
+            {PLACE_CATEGORY_LABELS[mission.place_category as PlaceCategory] ??
+              mission.place_category}
+          </span>
+        </div>
+        <h3 className="text-base font-bold text-stranger-light">
+          {mission.place_name}
+        </h3>
+        <p className="text-xs text-gray-400">{mission.place_address}</p>
+      </div>
+
+      {/* 일시 */}
+      <div className="flex items-center gap-3 rounded-lg bg-stranger-mid px-4 py-3">
+        <svg
+          className="h-5 w-5 text-stranger-accent"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
+          />
+        </svg>
+        <div>
+          <p className="text-sm font-medium text-stranger-light">
+            {formattedDate}
+          </p>
+          <p className="text-xs text-gray-400">{formattedTime}</p>
+        </div>
+      </div>
+
+      {/* 상대 닉네임 */}
+      {partnerNickname && (
+        <div className="rounded-lg bg-stranger-mid px-4 py-3">
+          <p className="mb-1 text-xs text-gray-400">상대방</p>
+          <p className="text-sm font-bold text-stranger-accent">{partnerNickname}</p>
+        </div>
+      )}
+
+      {/* 나의 소품 */}
+      <div className="rounded-lg bg-stranger-mid px-4 py-3">
+        <p className="mb-1 text-xs text-gray-400">
+          나의 식별 소품 (
+          {PROP_CATEGORY_LABELS[myPropCategory as PropCategory] ??
+            myPropCategory}
+          )
+        </p>
+        <p className="text-sm font-medium text-stranger-light">{myPropName}</p>
+        {myPropDesc && (
+          <p className="mt-1 text-xs text-gray-400">{myPropDesc}</p>
+        )}
+      </div>
+
+      {/* 나의 식별 행동 */}
+      {myAction && (
+        <div className="rounded-lg bg-stranger-mid px-4 py-3">
+          <p className="mb-1 text-xs text-gray-400">나의 식별 행동</p>
+          <p className="text-sm font-medium text-stranger-light">{myAction}</p>
+        </div>
+      )}
+
+      {/* 출발 확인 */}
+      {mission.status === "scheduled" && (
+        <DepartureConfirmation
+          missionId={mission.id}
+          meetingDate={mission.meeting_date}
+          meetingTime={mission.meeting_time}
+          isConfirmed={myConfirmed}
+          partnerConfirmed={partnerConfirmed}
+        />
+      )}
+    </div>
+  );
+}

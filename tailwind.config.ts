@@ -9,8 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        stranger: {
+          dark: "#1a1a2e",
+          mid: "#16213e",
+          accent: "#e94560",
+          light: "#f5f5f5",
+        },
         background: "var(--background)",
         foreground: "var(--foreground)",
+      },
+      fontFamily: {
+        pretendard: ["var(--font-pretendard)", "Pretendard", "sans-serif"],
       },
     },
   },

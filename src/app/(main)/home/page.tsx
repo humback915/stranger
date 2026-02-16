@@ -1,0 +1,205 @@
+import Link from "next/link";
+import { getMyMatches } from "@/actions/matching";
+import { ROUTES } from "@/lib/constants/routes";
+
+const GENDER_LABELS: Record<string, string> = {
+  male: "남성",
+  female: "여성",
+  any: "무관",
+};
+
+export default async function HomePage() {
+  const result = await getMyMatches();
+  const matches = result.matches ?? [];
+
+  const pendingMatches = matches.filter((m) => m.status === "pending");
+  const activeMatches = matches.filter((m) =>
+    ["accepted", "completed"].includes(m.status)
+  );
+
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <div className="px-6 py-8">
+      <p className="text-gray-400">
+        가치관 질문에 답하고 나와 맞는 사람을 만나보세요
+      </p>
+
+      <div className="mt-8 flex flex-col gap-4">
+        <div className="rounded-2xl bg-stranger-mid p-6">
+          <h3 className="font-medium text-stranger-light">
+            오늘의 질문에 답해보세요
+          </h3>
+          <p className="mt-1 text-sm text-gray-400">
+            답변이 많을수록 더 정확한 매칭이 가능해요
+          </p>
+          <Link
+            href={ROUTES.QUESTIONS}
+            className="mt-4 inline-block rounded-xl bg-stranger-accent px-4 py-2 text-sm font-medium text-white"
+          >
+            질문 답변하기
+          </Link>
+        </div>
+
+        <div className="rounded-2xl bg-stranger-mid p-6">
+          <div className="flex items-center justify-between">
+            <h3 className="font-medium text-stranger-light">매칭 현황</h3>
+            <Link
+              href={ROUTES.MATCHES}
+              className="text-xs text-stranger-accent"
+            >
+              전체보기
+            </Link>
+          </div>
+
+          {matches.length === 0 ? (
+            <p className="mt-2 text-sm text-gray-400">
+              아직 진행 중인 매칭이 없습니다
+            </p>
+          ) : (
+            <div className="mt-3 space-y-3">
+              {/* 활성 매칭 */}
+              {activeMatches.map((match) => {
+                const p = match.partner;
+                const age = p ? currentYear - p.birth_year : null;
+                return (
+                  <Link
+                    key={match.id}
+                    href={
+                      match.missionId
+                        ? ROUTES.MISSION_DETAIL(match.missionId)
+                        : ROUTES.MATCHES
+                    }
+                    className="block rounded-xl bg-stranger-dark p-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/20 text-sm">
+                        {p?.gender === "male" ? "👨" : "👩"}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-stranger-light">
+                            {p ? `${GENDER_LABELS[p.gender]} · ${age}세` : "정보 없음"}
+                          </span>
+                          {p?.mbti && (
+                            <span className="rounded bg-stranger-accent/20 px-1.5 py-0.5 text-[10px] text-stranger-accent">
+                              {p.mbti}
+                            </span>
+                          )}
+                          <span className="rounded-md bg-green-500/20 px-1.5 py-0.5 text-[10px] text-green-400">
+                            매칭 성사
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-400">
+                          {p?.occupation} · {p?.activity_area}
+                        </p>
+                      </div>
+                      <svg
+                        className="h-4 w-4 shrink-0 text-gray-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5 pl-[52px]">
+                      <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-stranger-accent">
+                        호환도 {Math.round(match.compatibility_score * 100)}%
+                      </span>
+                      {match.missionId && (
+                        <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-blue-400">
+                          미션 진행 중
+                        </span>
+                      )}
+                      {p?.hobbies?.slice(0, 3).map((h: string) => (
+                        <span key={h} className="rounded-md bg-stranger-accent/15 px-2 py-0.5 text-[10px] text-stranger-accent">
+                          {h}
+                        </span>
+                      ))}
+                    </div>
+                  </Link>
+                );
+              })}
+
+              {/* 대기 중인 매칭 */}
+              {pendingMatches.map((match) => {
+                const p = match.partner;
+                const age = p ? currentYear - p.birth_year : null;
+                const myAccepted =
+                  match.role === "user_a"
+                    ? match.user_a_accepted
+                    : match.user_b_accepted;
+
+                return (
+                  <Link
+                    key={match.id}
+                    href={ROUTES.MATCHES}
+                    className="block rounded-xl bg-stranger-dark p-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/20 text-sm">
+                        {p?.gender === "male" ? "👨" : "👩"}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-stranger-light">
+                            {p ? `${GENDER_LABELS[p.gender]} · ${age}세` : "정보 없음"}
+                          </span>
+                          {p?.mbti && (
+                            <span className="rounded bg-stranger-accent/20 px-1.5 py-0.5 text-[10px] text-stranger-accent">
+                              {p.mbti}
+                            </span>
+                          )}
+                          <span className="rounded-md bg-yellow-500/20 px-1.5 py-0.5 text-[10px] text-yellow-400">
+                            {myAccepted === true ? "상대 응답 대기" : "응답 대기"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-400">
+                          {p?.activity_area}
+                        </p>
+                      </div>
+                      <svg
+                        className="h-4 w-4 shrink-0 text-gray-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5 pl-[52px]">
+                      <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-stranger-accent">
+                        호환도 {Math.round(match.compatibility_score * 100)}%
+                      </span>
+                      {p?.preferred_gender && (
+                        <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-gray-400">
+                          선호: {GENDER_LABELS[p.preferred_gender]}
+                        </span>
+                      )}
+                      {p?.preferred_age_min != null && (
+                        <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-gray-400">
+                          {p.preferred_age_min}~{p.preferred_age_max}세
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
