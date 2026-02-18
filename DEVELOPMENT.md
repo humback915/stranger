@@ -893,12 +893,19 @@ ORDER BY m.meeting_time;
 - **safety_reports**: 본인 신고만 읽기, 인증 유저 신고 가능
 - **no_show_checks**: 본인 것만 읽기/수정
 
+### 구현 완료
+- [x] 질문 목록 UI 및 답변 제출
+- [x] AI 매칭 알고리즘 (similarity/compatibility 계산)
+- [x] AI 미션 생성 (장소/소품 자동 선택) — OpenAI gpt-4o-mini, JSON 모드, 실패 시 랜덤 폴백
+- [x] 매칭 목록 UI
+- [x] 설정 페이지 (프로필 수정, 계정 정지, 탈퇴)
+- [x] Google Maps 장소 표시 — `@vis.gl/react-google-maps`, API 키 없으면 링크 폴백
+- [x] 관리자 대시보드 (신고 관리, 노쇼 관리) — `(admin)` 라우트 그룹, service_role RLS 우회
+- [x] 푸시 알림 (출발 확인 리마인더) — FCM, 멀티 디바이스, 만료 토큰 자동 정리, 크론 리마인더
+
 ### 아직 미구현 (TODO)
-- [ ] 질문 목록 UI 및 답변 제출
-- [ ] AI 매칭 알고리즘 (similarity/compatibility 계산)
-- [ ] AI 미션 생성 (장소/소품 자동 선택)
-- [ ] 매칭 목록 UI
-- [ ] 설정 페이지 (프로필 수정, 계정 정지, 탈퇴)
-- [ ] 푸시 알림 (출발 확인 리마인더)
-- [ ] Google Maps 장소 표시
-- [ ] 관리자 대시보드 (신고 관리, 노쇼 관리)
+- [ ] 프로덕션 배포 (Vercel + Cloud Supabase)
+- [ ] SMS Provider 연동 (Twilio 등 — 현재 Supabase 테스트 모드)
+- [ ] 이미지 최적화 (`<img>` → `next/image`)
+- [ ] 매칭 만료 자동 처리 (크론 또는 DB 트리거)
+- [ ] 채팅 기능 (매칭 성사 후 간단한 인앱 메시지)

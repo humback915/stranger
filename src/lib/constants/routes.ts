@@ -22,4 +22,10 @@ export const ROUTES = {
   NOTIFICATIONS: "/notifications",
   SETTINGS: "/settings",
   AUTH_CALLBACK: "/api/auth/callback",
+  ADMIN: {
+    ROOT: "/admin",
+    REPORTS: "/admin/reports",
+    USERS: "/admin/users",
+    NO_SHOWS: "/admin/no-shows",
+  },
 } as const;

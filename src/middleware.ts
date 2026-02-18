@@ -46,6 +46,11 @@ export async function middleware(request: NextRequest) {
     (path) => pathname === path || pathname.startsWith("/api/auth")
   );
 
+  // 푸시 알림 API 경로는 별도 인증 사용
+  if (pathname.startsWith("/api/push")) {
+    return NextResponse.next();
+  }
+
   // 미인증 사용자 → 공개 경로 아니면 /login으로 리다이렉트
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
@@ -62,7 +67,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // 인증된 사용자가 메인 앱에 접근할 때 프로필이 있는지 확인
-  if (user && !isPublicPath && !pathname.startsWith("/onboarding")) {
+  // admin 라우트는 자체 인증 체크 사용
+  if (user && !isPublicPath && !pathname.startsWith("/onboarding") && !pathname.startsWith("/admin")) {
     const profileExists = await hasProfile(user.id);
 
     if (!profileExists) {

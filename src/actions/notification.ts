@@ -111,7 +111,7 @@ export async function markAllAsRead() {
   return { success: true };
 }
 
-/** 내부 헬퍼: 알림 생성 (서버 액션에서 호출) */
+/** 내부 헬퍼: 알림 생성 (서버 액션에서 호출) + 푸시 전송 */
 export async function createNotification(params: {
   userId: string;
   type: "match_new" | "match_accepted" | "match_rejected" | "mission_created";
@@ -130,4 +130,18 @@ export async function createNotification(params: {
     related_match_id: params.relatedMatchId ?? null,
     related_mission_id: params.relatedMissionId ?? null,
   });
+
+  // 푸시 알림 전송 (Firebase 미설정 시 자동 스킵)
+  try {
+    const { sendPushToUser } = await import("@/actions/push");
+    const pushData: Record<string, string> = {};
+    if (params.relatedMissionId) {
+      pushData.url = `/missions/${params.relatedMissionId}`;
+    } else if (params.relatedMatchId) {
+      pushData.url = "/matches";
+    }
+    await sendPushToUser(params.userId, params.title, params.body, pushData);
+  } catch {
+    // 푸시 실패는 무시
+  }
 }

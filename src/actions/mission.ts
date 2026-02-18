@@ -164,7 +164,7 @@ export async function getMission(missionId: number) {
   const { data: mission, error } = await supabase
     .from("missions")
     .select(
-      "id, match_id, place_name, place_address, place_lat, place_lng, place_category, user_a_prop_category, user_a_prop_name, user_a_prop_description, user_b_prop_category, user_b_prop_name, user_b_prop_description, user_a_action, user_b_action, meeting_date, meeting_time, user_a_departure_confirmed, user_b_departure_confirmed, status, created_at, updated_at"
+      "id, match_id, place_name, place_address, place_lat, place_lng, place_category, user_a_prop_category, user_a_prop_name, user_a_prop_description, user_b_prop_category, user_b_prop_name, user_b_prop_description, user_a_action, user_b_action, meeting_date, meeting_time, user_a_departure_confirmed, user_b_departure_confirmed, status, ai_place_rationale, ai_prop_rationale_a, ai_prop_rationale_b, created_at, updated_at"
     )
     .eq("id", missionId)
     .single();

@@ -3,6 +3,7 @@ import { AuthProvider } from "@/providers/AuthProvider";
 import BottomNav from "@/components/layout/BottomNav";
 import SafetyButton from "@/components/layout/SafetyButton";
 import NotificationBell from "@/components/layout/NotificationBell";
+import PushNotificationManager from "@/components/push/PushNotificationManager";
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
@@ -20,6 +21,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         <div className="mx-auto max-w-md">{children}</div>
         <SafetyButton />
         <BottomNav />
+        <PushNotificationManager />
       </div>
     </AuthProvider>
   );

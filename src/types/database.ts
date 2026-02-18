@@ -31,6 +31,7 @@ export type Database = {
           preferred_distance_km: number;
           status: "active" | "paused" | "banned";
           no_show_count: number;
+          is_admin: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -55,6 +56,7 @@ export type Database = {
           preferred_distance_km?: number;
           status?: "active" | "paused" | "banned";
           no_show_count?: number;
+          is_admin?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -79,6 +81,7 @@ export type Database = {
           preferred_distance_km?: number;
           status?: "active" | "paused" | "banned";
           no_show_count?: number;
+          is_admin?: boolean;
         };
         Relationships: [];
       };
@@ -159,6 +162,7 @@ export type Database = {
           user_a_accepted: boolean | null;
           user_b_accepted: boolean | null;
           status: "pending" | "accepted" | "rejected" | "expired" | "completed";
+          ai_description: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -172,6 +176,7 @@ export type Database = {
           user_a_accepted?: boolean | null;
           user_b_accepted?: boolean | null;
           status?: "pending" | "accepted" | "rejected" | "expired" | "completed";
+          ai_description?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -182,6 +187,7 @@ export type Database = {
           user_a_accepted?: boolean | null;
           user_b_accepted?: boolean | null;
           status?: "pending" | "accepted" | "rejected" | "expired" | "completed";
+          ai_description?: string | null;
         };
         Relationships: [
           {
@@ -220,6 +226,9 @@ export type Database = {
           user_a_departure_confirmed: boolean;
           user_b_departure_confirmed: boolean;
           status: "scheduled" | "in_progress" | "completed" | "cancelled";
+          ai_place_rationale: string | null;
+          ai_prop_rationale_a: string | null;
+          ai_prop_rationale_b: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -244,6 +253,9 @@ export type Database = {
           user_a_departure_confirmed?: boolean;
           user_b_departure_confirmed?: boolean;
           status?: "scheduled" | "in_progress" | "completed" | "cancelled";
+          ai_place_rationale?: string | null;
+          ai_prop_rationale_a?: string | null;
+          ai_prop_rationale_b?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -266,6 +278,9 @@ export type Database = {
           user_a_departure_confirmed?: boolean;
           user_b_departure_confirmed?: boolean;
           status?: "scheduled" | "in_progress" | "completed" | "cancelled";
+          ai_place_rationale?: string | null;
+          ai_prop_rationale_a?: string | null;
+          ai_prop_rationale_b?: string | null;
         };
         Relationships: [
           {
@@ -478,6 +493,37 @@ export type Database = {
           },
           {
             foreignKeyName: "no_show_checks_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      push_subscriptions: {
+        Row: {
+          id: number;
+          user_id: string;
+          fcm_token: string;
+          device_info: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: number;
+          user_id: string;
+          fcm_token: string;
+          device_info?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          fcm_token?: string;
+          device_info?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey";
             columns: ["user_id"];
             referencedRelation: "profiles";
             referencedColumns: ["id"];

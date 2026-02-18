@@ -41,6 +41,7 @@ interface MatchCardProps {
     created_at: string;
     role: "user_a" | "user_b";
     partner: Partner | null;
+    ai_description?: string | null;
     missionId?: number | null;
   };
   onStatusChange?: (
@@ -211,6 +212,16 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
           </p>
         </div>
       </div>
+
+      {/* AI 호환성 분석 */}
+      {match.ai_description && (
+        <div className="mb-4 rounded-lg bg-stranger-dark px-4 py-3">
+          <p className="mb-1 text-xs text-stranger-accent">AI 호환성 분석</p>
+          <p className="text-sm leading-relaxed text-gray-300">
+            {match.ai_description}
+          </p>
+        </div>
+      )}
 
       {/* 양쪽 수락 상태 표시 (pending 중) */}
       {status === "pending" && myAccepted === true && (

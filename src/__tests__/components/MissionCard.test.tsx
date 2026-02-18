@@ -7,10 +7,17 @@ vi.mock("@/components/mission/DepartureConfirmation", () => ({
   default: () => <div data-testid="departure-confirmation" />,
 }));
 
+// Mock MissionMap
+vi.mock("@/components/mission/MissionMap", () => ({
+  default: () => <div data-testid="mission-map" />,
+}));
+
 const baseMission = {
   id: 1,
   place_name: "스타벅스 강남점",
   place_address: "서울시 강남구",
+  place_lat: 37.4979,
+  place_lng: 127.0276,
   place_category: "cafe",
   user_a_prop_category: "clothing_color",
   user_a_prop_name: "빨간색 상의",

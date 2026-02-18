@@ -5,12 +5,15 @@ import { PROP_CATEGORY_LABELS } from "@/lib/constants/props";
 import type { PlaceCategory } from "@/lib/constants/places";
 import type { PropCategory } from "@/lib/constants/props";
 import DepartureConfirmation from "./DepartureConfirmation";
+import MissionMap from "./MissionMap";
 
 interface MissionCardProps {
   mission: {
     id: number;
     place_name: string;
     place_address: string;
+    place_lat: number;
+    place_lng: number;
     place_category: string;
     user_a_prop_category: string;
     user_a_prop_name: string;
@@ -25,6 +28,9 @@ interface MissionCardProps {
     user_a_departure_confirmed: boolean;
     user_b_departure_confirmed: boolean;
     status: string;
+    ai_place_rationale?: string | null;
+    ai_prop_rationale_a?: string | null;
+    ai_prop_rationale_b?: string | null;
   };
   role: "user_a" | "user_b";
   partnerNickname?: string;
@@ -44,6 +50,9 @@ export default function MissionCard({ mission, role, partnerNickname }: MissionC
   const myAction = isUserA
     ? mission.user_a_action
     : mission.user_b_action;
+  const myPropRationale = isUserA
+    ? mission.ai_prop_rationale_a
+    : mission.ai_prop_rationale_b;
   const myConfirmed = isUserA
     ? mission.user_a_departure_confirmed
     : mission.user_b_departure_confirmed;
@@ -71,7 +80,19 @@ export default function MissionCard({ mission, role, partnerNickname }: MissionC
           {mission.place_name}
         </h3>
         <p className="text-xs text-gray-400">{mission.place_address}</p>
+        {mission.ai_place_rationale && (
+          <p className="mt-1 text-xs text-stranger-accent">
+            {mission.ai_place_rationale}
+          </p>
+        )}
       </div>
+
+      {/* 지도 */}
+      <MissionMap
+        lat={mission.place_lat}
+        lng={mission.place_lng}
+        placeName={mission.place_name}
+      />
 
       {/* 일시 */}
       <div className="flex items-center gap-3 rounded-lg bg-stranger-mid px-4 py-3">
@@ -115,6 +136,11 @@ export default function MissionCard({ mission, role, partnerNickname }: MissionC
         <p className="text-sm font-medium text-stranger-light">{myPropName}</p>
         {myPropDesc && (
           <p className="mt-1 text-xs text-gray-400">{myPropDesc}</p>
+        )}
+        {myPropRationale && (
+          <p className="mt-1 text-xs text-stranger-accent">
+            {myPropRationale}
+          </p>
         )}
       </div>
 

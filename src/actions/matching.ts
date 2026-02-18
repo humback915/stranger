@@ -5,6 +5,7 @@ import { PLACE_CATEGORIES, PLACE_EXAMPLES } from "@/lib/constants/places";
 import { PROP_CATEGORIES, PROP_OPTIONS } from "@/lib/constants/props";
 import { IDENTIFICATION_ACTIONS } from "@/lib/constants/actions";
 import { createNotification } from "@/actions/notification";
+import { generateMatchDescription, generateAIMission } from "@/actions/ai";
 
 /** 두 좌표 간 거리(km) - Haversine 공식 */
 function haversineKm(
@@ -294,6 +295,34 @@ export async function runMatching() {
     return { error: error.message };
   }
 
+  // AI 호환성 설명 생성 (실패해도 계속 진행)
+  try {
+    const [{ data: pA }, { data: pB }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("nickname, gender, birth_year, occupation, mbti, hobbies, personality, ideal_type")
+        .eq("id", userAId)
+        .single(),
+      supabase
+        .from("profiles")
+        .select("nickname, gender, birth_year, occupation, mbti, hobbies, personality, ideal_type")
+        .eq("id", userBId)
+        .single(),
+    ]);
+
+    if (pA && pB) {
+      const aiDesc = await generateMatchDescription(pA, pB, best.similarity);
+      if (aiDesc) {
+        await supabase
+          .from("matches")
+          .update({ ai_description: aiDesc })
+          .eq("id", match.id);
+      }
+    }
+  } catch {
+    // AI 실패는 무시
+  }
+
   // 양쪽에 새 매칭 알림
   await Promise.all([
     createNotification({
@@ -337,7 +366,7 @@ export async function getMyMatches() {
   const { data: matches, error } = await supabase
     .from("matches")
     .select(
-      "id, user_a_id, user_b_id, similarity_score, compatibility_score, distance_km, user_a_accepted, user_b_accepted, status, created_at"
+      "id, user_a_id, user_b_id, similarity_score, compatibility_score, distance_km, user_a_accepted, user_b_accepted, status, ai_description, created_at"
     )
     .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`)
     .order("created_at", { ascending: false });
@@ -392,16 +421,16 @@ async function generateMission(
   userAId: string,
   userBId: string
 ) {
-  // 두 사용자 좌표 조회 → 중간 지점 계산
+  // 두 사용자 프로필 조회 (좌표 + AI용 정보)
   const { data: profileA } = await supabase
     .from("profiles")
-    .select("activity_lat, activity_lng")
+    .select("activity_lat, activity_lng, nickname, gender, birth_year, occupation, mbti, hobbies, personality, ideal_type")
     .eq("id", userAId)
     .single();
 
   const { data: profileB } = await supabase
     .from("profiles")
-    .select("activity_lat, activity_lng")
+    .select("activity_lat, activity_lng, nickname, gender, birth_year, occupation, mbti, hobbies, personality, ideal_type")
     .eq("id", userBId)
     .single();
 
@@ -412,28 +441,47 @@ async function generateMission(
     ? (profileA.activity_lng + profileB.activity_lng) / 2
     : 126.978;
 
-  // 랜덤 장소 선택
-  const placeCategory = pickRandom(PLACE_CATEGORIES);
-  const placeName = pickRandom(PLACE_EXAMPLES[placeCategory]);
-
-  // 각 유저에게 서로 다른 소품 카테고리 배정
-  const propCatA = pickRandom(PROP_CATEGORIES);
+  // AI 미션 생성 시도 → 실패 시 랜덤 폴백
+  let placeCategory = pickRandom(PLACE_CATEGORIES);
+  let placeName = pickRandom(PLACE_EXAMPLES[placeCategory]);
+  let propCatA = pickRandom(PROP_CATEGORIES);
   let propCatB = pickRandom(PROP_CATEGORIES);
-  // 가능하면 다른 카테고리
   if (PROP_CATEGORIES.length > 1) {
     while (propCatB === propCatA) {
       propCatB = pickRandom(PROP_CATEGORIES);
     }
   }
-  const propNameA = pickRandom(PROP_OPTIONS[propCatA]);
-  const propNameB = pickRandom(PROP_OPTIONS[propCatB]);
-
-  // 각 유저에게 서로 다른 식별 행동 배정
-  const actionA = pickRandom(IDENTIFICATION_ACTIONS);
-  let actionB = pickRandom(IDENTIFICATION_ACTIONS);
+  let propNameA = pickRandom(PROP_OPTIONS[propCatA]);
+  let propNameB = pickRandom(PROP_OPTIONS[propCatB]);
+  let actionA: string = pickRandom(IDENTIFICATION_ACTIONS);
+  let actionB: string = pickRandom(IDENTIFICATION_ACTIONS);
   if (IDENTIFICATION_ACTIONS.length > 1) {
     while (actionB === actionA) {
       actionB = pickRandom(IDENTIFICATION_ACTIONS);
+    }
+  }
+  let aiPlaceRationale: string | null = null;
+  let aiPropRationaleA: string | null = null;
+  let aiPropRationaleB: string | null = null;
+
+  if (profileA && profileB) {
+    try {
+      const aiResult = await generateAIMission(profileA, profileB);
+      if (aiResult) {
+        placeCategory = aiResult.place_category;
+        placeName = aiResult.place_name;
+        propCatA = aiResult.prop_a_category;
+        propNameA = aiResult.prop_a_name;
+        propCatB = aiResult.prop_b_category;
+        propNameB = aiResult.prop_b_name;
+        actionA = aiResult.action_a;
+        actionB = aiResult.action_b;
+        aiPlaceRationale = aiResult.place_rationale;
+        aiPropRationaleA = aiResult.prop_a_rationale;
+        aiPropRationaleB = aiResult.prop_b_rationale;
+      }
+    } catch {
+      // AI 실패 → 랜덤 값 그대로 사용
     }
   }
 
@@ -460,6 +508,9 @@ async function generateMission(
       user_b_action: actionB,
       meeting_date: dateStr,
       meeting_time: timeStr,
+      ai_place_rationale: aiPlaceRationale,
+      ai_prop_rationale_a: aiPropRationaleA,
+      ai_prop_rationale_b: aiPropRationaleB,
     })
     .select("id")
     .single();
