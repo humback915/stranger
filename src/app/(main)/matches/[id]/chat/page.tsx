@@ -43,6 +43,9 @@ export default async function ChatPage({ params }: ChatPageProps) {
     redirect(ROUTES.MATCHES);
   }
 
+  const partnerId =
+    match.user_a_id === user.id ? match.user_b_id : match.user_a_id;
+
   // 초기 메시지 로드
   const { messages } = await getMessages(matchId);
 
@@ -68,6 +71,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
       <ChatWindow
         matchId={matchId}
         currentUserId={user.id}
+        partnerId={partnerId}
         initialMessages={messages}
       />
     </div>

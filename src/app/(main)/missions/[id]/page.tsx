@@ -25,7 +25,7 @@ export default async function MissionPage({ params }: MissionPageProps) {
       <h2 className="mb-4 text-xl font-bold text-stranger-light">
         미션 상세
       </h2>
-      <MissionCard mission={result.mission} role={result.role} partnerNickname={result.partnerNickname} />
+      <MissionCard mission={result.mission} role={result.role} partnerNickname={result.partnerNickname} partnerId={result.partnerId} />
     </div>
   );
 }

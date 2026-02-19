@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { PLACE_CATEGORY_LABELS } from "@/lib/constants/places";
 import { PROP_CATEGORY_LABELS } from "@/lib/constants/props";
 import type { PlaceCategory } from "@/lib/constants/places";
 import type { PropCategory } from "@/lib/constants/props";
 import DepartureConfirmation from "./DepartureConfirmation";
 import MissionMap from "./MissionMap";
+import ReportModal from "@/components/safety/ReportModal";
 
 interface MissionCardProps {
   mission: {
@@ -34,10 +36,12 @@ interface MissionCardProps {
   };
   role: "user_a" | "user_b";
   partnerNickname?: string;
+  partnerId?: string;
 }
 
-export default function MissionCard({ mission, role, partnerNickname }: MissionCardProps) {
+export default function MissionCard({ mission, role, partnerNickname, partnerId }: MissionCardProps) {
   const isUserA = role === "user_a";
+  const [reportOpen, setReportOpen] = useState(false);
   const myPropCategory = isUserA
     ? mission.user_a_prop_category
     : mission.user_b_prop_category;
@@ -160,6 +164,25 @@ export default function MissionCard({ mission, role, partnerNickname }: MissionC
           meetingTime={mission.meeting_time}
           isConfirmed={myConfirmed}
           partnerConfirmed={partnerConfirmed}
+        />
+      )}
+
+      {/* 신고 */}
+      {partnerId && (
+        <button
+          onClick={() => setReportOpen(true)}
+          className="mt-2 w-full text-center text-xs text-gray-600 hover:text-red-400"
+        >
+          이 상대방 신고하기
+        </button>
+      )}
+
+      {partnerId && (
+        <ReportModal
+          reportedUserId={partnerId}
+          missionId={mission.id}
+          isOpen={reportOpen}
+          onClose={() => setReportOpen(false)}
         />
       )}
     </div>

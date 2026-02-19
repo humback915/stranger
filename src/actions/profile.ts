@@ -19,7 +19,7 @@ export async function getMyProfile() {
   const { data: profile, error } = await supabase
     .from("profiles")
     .select(
-      "id, phone, nickname, birth_year, gender, occupation, mbti, hobbies, personality, ideal_type, activity_area, preferred_gender, preferred_age_min, preferred_age_max, preferred_distance_km, status, no_show_count, created_at"
+      "id, phone, nickname, birth_year, gender, occupation, mbti, hobbies, personality, ideal_type, photo_urls, activity_area, preferred_gender, preferred_age_min, preferred_age_max, preferred_distance_km, status, no_show_count, created_at"
     )
     .eq("id", user.id)
     .single();

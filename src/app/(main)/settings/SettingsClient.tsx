@@ -10,12 +10,14 @@ import { REGIONS, findArea } from "@/lib/constants/areas";
 import { HOBBIES } from "@/lib/constants/hobbies";
 import { PERSONALITIES } from "@/lib/constants/personality";
 import { IDEAL_TYPES } from "@/lib/constants/ideal-type";
+import PhotoEditor from "@/components/profile/PhotoEditor";
 
 interface Profile {
   id: string;
   phone: string;
   nickname: string;
   birth_year: number;
+  photo_urls: string[];
   gender: "male" | "female";
   occupation: string;
   mbti: string | null;
@@ -49,6 +51,8 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
   const [isPending, startTransition] = useTransition();
   const [matchingStatus, setMatchingStatus] = useState(profile.status);
   const [statusPending, startStatusTransition] = useTransition();
+  const [isPhotoEditing, setIsPhotoEditing] = useState(false);
+  const [currentPhotos, setCurrentPhotos] = useState(profile.photo_urls ?? []);
 
   // 수정 가능한 필드 상태
   const [nickname, setNickname] = useState(profile.nickname);
@@ -421,6 +425,45 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
             수정
           </button>
         </div>
+
+        {/* 사진 미리보기 */}
+        {currentPhotos.length > 0 && (
+          <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+            {currentPhotos.map((url, i) => (
+              <div key={url} className="relative h-16 w-16 shrink-0">
+                <img
+                  src={url}
+                  alt={`사진 ${i + 1}`}
+                  className="h-full w-full rounded-lg object-cover"
+                />
+                {i === 0 && (
+                  <span className="absolute bottom-0.5 left-0.5 rounded bg-stranger-accent/90 px-1 py-0.5 text-[8px] text-white">
+                    대표
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 사진 관리 버튼 */}
+        {!isPhotoEditing ? (
+          <button
+            onClick={() => setIsPhotoEditing(true)}
+            className="mb-3 w-full rounded-lg border border-dashed border-gray-600 py-2 text-xs text-gray-400 hover:border-stranger-accent hover:text-stranger-accent"
+          >
+            사진 관리 ({currentPhotos.length}/{5})
+          </button>
+        ) : (
+          <PhotoEditor
+            initialPhotos={currentPhotos}
+            onSaved={() => {
+              setIsPhotoEditing(false);
+              router.refresh();
+            }}
+            onCancel={() => setIsPhotoEditing(false)}
+          />
+        )}
 
         <div className="space-y-3">
           <InfoRow label="닉네임" value={profile.nickname} />

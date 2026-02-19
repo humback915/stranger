@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import ChatInput from "./ChatInput";
+import ReportModal from "@/components/safety/ReportModal";
 
 interface Message {
   id: number;
@@ -15,15 +16,18 @@ interface Message {
 interface ChatWindowProps {
   matchId: number;
   currentUserId: string;
+  partnerId: string;
   initialMessages: Message[];
 }
 
 export default function ChatWindow({
   matchId,
   currentUserId,
+  partnerId,
   initialMessages,
 }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [reportOpen, setReportOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // 새 메시지 수신 시 맨 아래로 스크롤
@@ -63,6 +67,23 @@ export default function ChatWindow({
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
+      {/* 신고 버튼 */}
+      <div className="flex justify-end px-4 py-1.5 border-b border-stranger-mid/50">
+        <button
+          onClick={() => setReportOpen(true)}
+          className="text-xs text-gray-600 hover:text-red-400"
+        >
+          신고하기
+        </button>
+      </div>
+
+      {/* 신고 모달 */}
+      <ReportModal
+        reportedUserId={partnerId}
+        isOpen={reportOpen}
+        onClose={() => setReportOpen(false)}
+      />
+
       {/* 메시지 목록 */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {messages.length === 0 && (
