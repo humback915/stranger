@@ -43,6 +43,8 @@ interface MatchCardProps {
     partner: Partner | null;
     ai_description?: string | null;
     missionId?: number | null;
+    lastMessage?: { content: string; created_at: string; is_mine: boolean } | null;
+    unreadCount?: number;
   };
   onStatusChange?: (
     matchId: number,
@@ -63,6 +65,8 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
   const [missionId, setMissionId] = useState<number | null>(
     match.missionId ?? null
   );
+  const unreadCount = match.unreadCount ?? 0;
+  const lastMessage = match.lastMessage ?? null;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
 
@@ -271,14 +275,39 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
         </div>
       )}
 
+      {/* 채팅 미리보기 */}
+      {status === "accepted" && lastMessage && (
+        <div className="mb-3 rounded-lg bg-stranger-dark px-3 py-2.5">
+          <p className="truncate text-xs text-gray-300">
+            {lastMessage.is_mine && (
+              <span className="mr-1 text-gray-500">나:</span>
+            )}
+            {lastMessage.content}
+          </p>
+          <p className="mt-0.5 text-[10px] text-gray-600">
+            {new Date(lastMessage.created_at).toLocaleString("ko-KR", {
+              month: "numeric",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+        </div>
+      )}
+
       {/* 매칭 성사 → 채팅 + 미션 링크 */}
       {status === "accepted" && (
         <div className="flex gap-2">
           <Link
             href={ROUTES.CHAT(match.id)}
-            className="flex-1 rounded-lg border border-stranger-accent py-3 text-center text-sm font-medium text-stranger-accent"
+            className="relative flex-1 rounded-lg border border-stranger-accent py-3 text-center text-sm font-medium text-stranger-accent"
           >
             채팅하기
+            {unreadCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </Link>
           {missionId && (
             <Link

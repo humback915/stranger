@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import ChatInput from "./ChatInput";
 import ReportModal from "@/components/safety/ReportModal";
+import { markChatAsRead } from "@/actions/chat";
 
 interface Message {
   id: number;
@@ -30,10 +31,16 @@ export default function ChatWindow({
   const [reportOpen, setReportOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // 새 메시지 수신 시 맨 아래로 스크롤
+  // 채팅 창 열리면 읽음 처리
+  useEffect(() => {
+    markChatAsRead(matchId);
+  }, [matchId]);
+
+  // 새 메시지 수신 시 맨 아래로 스크롤 + 읽음 처리
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    markChatAsRead(matchId);
+  }, [messages, matchId]);
 
   // Supabase Realtime 구독
   useEffect(() => {

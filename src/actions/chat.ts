@@ -53,6 +53,24 @@ export async function getMessages(matchId: number) {
 }
 
 /**
+ * 채팅 읽음 커서 업데이트 (채팅 창 열 때 호출)
+ */
+export async function markChatAsRead(matchId: number) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  await supabase.from("match_read_cursors").upsert(
+    { user_id: user.id, match_id: matchId, last_read_at: new Date().toISOString() },
+    { onConflict: "user_id,match_id" }
+  );
+}
+
+/**
  * 메시지 전송
  */
 export async function sendMessage(matchId: number, content: string) {

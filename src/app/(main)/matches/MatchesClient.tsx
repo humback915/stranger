@@ -36,6 +36,8 @@ interface Match {
   role: "user_a" | "user_b";
   partner: Partner | null;
   missionId: number | null;
+  lastMessage: { content: string; created_at: string; is_mine: boolean } | null;
+  unreadCount: number;
 }
 
 interface MatchesClientProps {

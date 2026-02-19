@@ -533,6 +533,35 @@ export type Database = {
           },
         ];
       };
+      match_read_cursors: {
+        Row: {
+          user_id: string;
+          match_id: number;
+          last_read_at: string;
+        };
+        Insert: {
+          user_id: string;
+          match_id: number;
+          last_read_at?: string;
+        };
+        Update: {
+          last_read_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "match_read_cursors_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "match_read_cursors_match_id_fkey";
+            columns: ["match_id"];
+            referencedRelation: "matches";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       messages: {
         Row: {
           id: number;

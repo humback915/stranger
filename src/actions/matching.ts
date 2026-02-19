@@ -396,11 +396,58 @@ export async function getMyMatches() {
         .limit(1)
         .maybeSingle();
 
+      // accepted 매칭: 마지막 메시지 + 미읽음 수 조회
+      let lastMessage: { content: string; created_at: string; is_mine: boolean } | null = null;
+      let unreadCount = 0;
+
+      if (match.status === "accepted" || match.status === "completed") {
+        const [{ data: lastMsg }, { data: cursor }] = await Promise.all([
+          supabase
+            .from("messages")
+            .select("content, created_at, sender_id")
+            .eq("match_id", match.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from("match_read_cursors")
+            .select("last_read_at")
+            .eq("user_id", user.id)
+            .eq("match_id", match.id)
+            .maybeSingle(),
+        ]);
+
+        if (lastMsg) {
+          lastMessage = {
+            content: lastMsg.content,
+            created_at: lastMsg.created_at,
+            is_mine: lastMsg.sender_id === user.id,
+          };
+        }
+
+        if (match.status === "accepted") {
+          let unreadQuery = supabase
+            .from("messages")
+            .select("id", { count: "exact", head: true })
+            .eq("match_id", match.id)
+            .neq("sender_id", user.id);
+
+          if (cursor?.last_read_at) {
+            unreadQuery = unreadQuery.gt("created_at", cursor.last_read_at);
+          }
+
+          const { count } = await unreadQuery;
+          unreadCount = count ?? 0;
+        }
+      }
+
       return {
         ...match,
         role: match.user_a_id === user.id ? ("user_a" as const) : ("user_b" as const),
         partner,
         missionId: mission?.id ?? null,
+        lastMessage,
+        unreadCount,
       };
     })
   );
