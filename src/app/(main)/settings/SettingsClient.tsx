@@ -14,6 +14,7 @@ import { IDEAL_TYPES } from "@/lib/constants/ideal-type";
 interface Profile {
   id: string;
   phone: string;
+  nickname: string;
   birth_year: number;
   gender: "male" | "female";
   occupation: string;
@@ -46,8 +47,11 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [matchingStatus, setMatchingStatus] = useState(profile.status);
+  const [statusPending, startStatusTransition] = useTransition();
 
   // 수정 가능한 필드 상태
+  const [nickname, setNickname] = useState(profile.nickname);
   const [occupation, setOccupation] = useState(profile.occupation);
   const [mbti, setMbti] = useState(profile.mbti ?? "");
   const [hobbies, setHobbies] = useState<string[]>(profile.hobbies ?? []);
@@ -78,6 +82,15 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
     day: "numeric",
   });
 
+  const handleToggleMatchingStatus = () => {
+    if (matchingStatus === "banned") return;
+    const next = matchingStatus === "active" ? "paused" : "active";
+    startStatusTransition(async () => {
+      const result = await updateProfile({ status: next });
+      if (!result.error) setMatchingStatus(next);
+    });
+  };
+
   const handleLogout = () => {
     startTransition(async () => {
       await signOut();
@@ -86,6 +99,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
   };
 
   const handleCancelEdit = () => {
+    setNickname(profile.nickname);
     setOccupation(profile.occupation);
     setMbti(profile.mbti ?? "");
     setHobbies(profile.hobbies ?? []);
@@ -105,6 +119,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
     startTransition(async () => {
       const area = findArea(activityArea);
       const result = await updateProfile({
+        nickname,
         occupation,
         mbti: mbti || null,
         hobbies,
@@ -143,6 +158,19 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
         </div>
 
         <div className="mt-6 space-y-5">
+          {/* 닉네임 */}
+          <div>
+            <label className="mb-1.5 block text-xs text-gray-400">닉네임</label>
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              maxLength={20}
+              placeholder="닉네임을 입력하세요"
+              className="w-full rounded-xl bg-stranger-mid px-4 py-3 text-sm text-stranger-light outline-none focus:ring-1 focus:ring-stranger-accent"
+            />
+          </div>
+
           {/* 직업 */}
           <div>
             <label className="mb-1.5 block text-xs text-gray-400">직업</label>
@@ -339,7 +367,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
           {/* 저장 버튼 */}
           <button
             onClick={handleSave}
-            disabled={isPending || !occupation.trim()}
+            disabled={isPending || !nickname.trim() || !occupation.trim()}
             className="w-full rounded-xl bg-stranger-accent py-3 text-sm font-medium text-white transition-opacity disabled:opacity-50"
           >
             {isPending ? "저장 중..." : "저장하기"}
@@ -379,10 +407,10 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
             </div>
             <div>
               <p className="text-base font-bold text-stranger-light">
-                {age}세 · {profile.occupation}
+                {profile.nickname} · {age}세
               </p>
               <p className="text-xs text-gray-400">
-                {profile.mbti ?? "MBTI 미설정"} · {profile.activity_area}
+                {profile.occupation} · {profile.mbti ?? "MBTI 미설정"}
               </p>
             </div>
           </div>
@@ -395,6 +423,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
         </div>
 
         <div className="space-y-3">
+          <InfoRow label="닉네임" value={profile.nickname} />
           <InfoRow label="전화번호" value={formatPhone(profile.phone)} />
           <InfoRow label="성별" value={GENDER_LABELS[profile.gender]} />
           <InfoRow label="출생연도" value={`${profile.birth_year}년`} />
@@ -436,6 +465,36 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
         </div>
       </div>
 
+      {/* 매칭 상태 */}
+      <div className="mt-4 rounded-2xl bg-stranger-mid p-5">
+        <h2 className="mb-3 text-sm font-bold text-stranger-light">매칭 설정</h2>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-stranger-light">매칭 활성화</p>
+            <p className="text-xs text-gray-400">
+              {matchingStatus === "active"
+                ? "현재 매칭 상대를 찾고 있습니다"
+                : matchingStatus === "paused"
+                  ? "매칭이 일시정지 상태입니다"
+                  : "계정이 정지되어 매칭할 수 없습니다"}
+            </p>
+          </div>
+          <button
+            onClick={handleToggleMatchingStatus}
+            disabled={statusPending || matchingStatus === "banned"}
+            className={`relative h-7 w-12 rounded-full transition-colors disabled:opacity-50 ${
+              matchingStatus === "active" ? "bg-stranger-accent" : "bg-gray-600"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                matchingStatus === "active" ? "translate-x-5" : "translate-x-0.5"
+              }`}
+            />
+          </button>
+        </div>
+      </div>
+
       {/* 계정 상태 */}
       <div className="mt-4 rounded-2xl bg-stranger-mid p-5">
         <h2 className="mb-3 text-sm font-bold text-stranger-light">
@@ -445,16 +504,16 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
           <InfoRow
             label="계정 상태"
             value={
-              profile.status === "active"
+              matchingStatus === "active"
                 ? "활성"
-                : profile.status === "paused"
+                : matchingStatus === "paused"
                   ? "일시정지"
                   : "정지됨"
             }
             valueColor={
-              profile.status === "active"
+              matchingStatus === "active"
                 ? "text-green-400"
-                : profile.status === "banned"
+                : matchingStatus === "banned"
                   ? "text-red-400"
                   : undefined
             }

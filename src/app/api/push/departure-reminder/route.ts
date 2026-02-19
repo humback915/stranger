@@ -1,18 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPushToUser } from "@/actions/push";
+import { isCronAuthorized } from "@/lib/cron-auth";
 
 /**
  * 출발 리마인더 크론 엔드포인트
  * 10분 간격으로 호출하여 만남 1시간 전 미확인 사용자에게 알림 전송
  */
-export async function GET(request: Request) {
-  // 간단한 크론 인증 (Authorization 헤더 또는 쿼리 파라미터)
-  const { searchParams } = new URL(request.url);
-  const cronSecret = searchParams.get("secret");
-  const expectedSecret = process.env.CRON_SECRET;
-
-  if (expectedSecret && cronSecret !== expectedSecret) {
+export async function GET(request: NextRequest) {
+  if (!isCronAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
