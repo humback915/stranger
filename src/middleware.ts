@@ -51,6 +51,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // 크론 API 경로는 자체 시크릿 인증 사용
+  if (pathname.startsWith("/api/cron")) {
+    return NextResponse.next();
+  }
+
   // 미인증 사용자 → 공개 경로 아니면 /login으로 리다이렉트
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();

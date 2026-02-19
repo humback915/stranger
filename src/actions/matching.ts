@@ -284,6 +284,7 @@ export async function runMatching() {
       similarity_score: Math.round(best.similarity * 100) / 100,
       compatibility_score: Math.round(best.compatibility * 100) / 100,
       distance_km: Math.round(best.distance * 10) / 10,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     })
     .select("id")
     .single();

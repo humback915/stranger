@@ -17,6 +17,7 @@ export const ROUTES = {
   HOME: "/home",
   QUESTIONS: "/questions",
   MATCHES: "/matches",
+  CHAT: (id: number) => `/matches/${id}/chat` as const,
   MISSIONS: "/missions",
   MISSION_DETAIL: (id: number) => `/missions/${id}` as const,
   NOTIFICATIONS: "/notifications",

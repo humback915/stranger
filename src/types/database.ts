@@ -163,6 +163,7 @@ export type Database = {
           user_b_accepted: boolean | null;
           status: "pending" | "accepted" | "rejected" | "expired" | "completed";
           ai_description: string | null;
+          expires_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -177,6 +178,7 @@ export type Database = {
           user_b_accepted?: boolean | null;
           status?: "pending" | "accepted" | "rejected" | "expired" | "completed";
           ai_description?: string | null;
+          expires_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -188,6 +190,7 @@ export type Database = {
           user_b_accepted?: boolean | null;
           status?: "pending" | "accepted" | "rejected" | "expired" | "completed";
           ai_description?: string | null;
+          expires_at?: string | null;
         };
         Relationships: [
           {
@@ -418,7 +421,7 @@ export type Database = {
         Row: {
           id: number;
           user_id: string;
-          type: "match_new" | "match_accepted" | "match_rejected" | "mission_created";
+          type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired";
           title: string;
           body: string;
           related_match_id: number | null;
@@ -429,7 +432,7 @@ export type Database = {
         Insert: {
           id?: number;
           user_id: string;
-          type: "match_new" | "match_accepted" | "match_rejected" | "mission_created";
+          type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired";
           title: string;
           body: string;
           related_match_id?: number | null;
@@ -530,6 +533,39 @@ export type Database = {
           },
         ];
       };
+      messages: {
+        Row: {
+          id: number;
+          match_id: number;
+          sender_id: string;
+          content: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: number;
+          match_id: number;
+          sender_id: string;
+          content: string;
+          created_at?: string;
+        };
+        Update: {
+          content?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey";
+            columns: ["match_id"];
+            referencedRelation: "matches";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey";
+            columns: ["sender_id"];
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -537,7 +573,7 @@ export type Database = {
       question_category: "values" | "lifestyle" | "romance" | "personality" | "taste";
       match_status: "pending" | "accepted" | "rejected" | "expired" | "completed";
       report_type: "harassment" | "inappropriate" | "no_show" | "safety" | "other";
-      notification_type: "match_new" | "match_accepted" | "match_rejected" | "mission_created";
+      notification_type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired";
     };
     CompositeTypes: Record<string, never>;
   };

@@ -271,14 +271,24 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
         </div>
       )}
 
-      {/* 매칭 성사 → 미션 링크 */}
-      {status === "accepted" && missionId && (
-        <Link
-          href={ROUTES.MISSION_DETAIL(missionId)}
-          className="block rounded-lg bg-stranger-accent py-3 text-center text-sm font-medium text-white"
-        >
-          미션 확인하기
-        </Link>
+      {/* 매칭 성사 → 채팅 + 미션 링크 */}
+      {status === "accepted" && (
+        <div className="flex gap-2">
+          <Link
+            href={ROUTES.CHAT(match.id)}
+            className="flex-1 rounded-lg border border-stranger-accent py-3 text-center text-sm font-medium text-stranger-accent"
+          >
+            채팅하기
+          </Link>
+          {missionId && (
+            <Link
+              href={ROUTES.MISSION_DETAIL(missionId)}
+              className="flex-1 rounded-lg bg-stranger-accent py-3 text-center text-sm font-medium text-white"
+            >
+              미션 확인하기
+            </Link>
+          )}
+        </div>
       )}
 
       {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
