@@ -107,5 +107,21 @@ export async function sendMessage(matchId: number, content: string) {
     return { error: error.message };
   }
 
+  // 상대방에게 푸시 알림 전송
+  const partnerId =
+    match.user_a_id === user.id ? match.user_b_id : match.user_a_id;
+
+  try {
+    const { sendPushToUser } = await import("@/actions/push");
+    await sendPushToUser(
+      partnerId,
+      "새 메시지",
+      trimmed.length > 50 ? `${trimmed.slice(0, 50)}...` : trimmed,
+      { url: `/matches/${matchId}/chat` }
+    );
+  } catch {
+    // 푸시 실패는 무시
+  }
+
   return { success: true };
 }

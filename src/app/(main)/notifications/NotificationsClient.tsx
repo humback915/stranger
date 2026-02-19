@@ -8,7 +8,7 @@ import { ROUTES } from "@/lib/constants/routes";
 interface Notification {
   id: number;
   user_id: string;
-  type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired";
+  type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired" | "no_show";
   title: string;
   body: string;
   related_match_id: number | null;

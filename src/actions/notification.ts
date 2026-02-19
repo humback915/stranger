@@ -30,7 +30,7 @@ export async function getMyNotifications() {
 type Notification = {
   id: number;
   user_id: string;
-  type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired";
+  type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired" | "no_show";
   title: string;
   body: string;
   related_match_id: number | null;
@@ -114,7 +114,7 @@ export async function markAllAsRead() {
 /** 내부 헬퍼: 알림 생성 (서버 액션에서 호출) + 푸시 전송 */
 export async function createNotification(params: {
   userId: string;
-  type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired";
+  type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired" | "no_show";
   title: string;
   body: string;
   relatedMatchId?: number | null;

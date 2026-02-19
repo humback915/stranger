@@ -91,7 +91,33 @@ export async function confirmDeparture(missionId: number) {
     return { error: checkError.message };
   }
 
-  return { success: true };
+  // 양쪽 모두 confirmed 이면 mission → completed, match → completed
+  const { data: allChecks } = await supabase
+    .from("no_show_checks")
+    .select("status")
+    .eq("mission_id", missionId);
+
+  const allConfirmed =
+    allChecks &&
+    allChecks.length >= 2 &&
+    allChecks.every((c) => c.status === "confirmed");
+
+  if (allConfirmed) {
+    await Promise.all([
+      supabase
+        .from("missions")
+        .update({ status: "completed" })
+        .eq("id", missionId),
+      supabase
+        .from("matches")
+        .update({ status: "completed" })
+        .eq("id", mission.match_id),
+    ]);
+
+    return { success: true, completed: true };
+  }
+
+  return { success: true, completed: false };
 }
 
 export async function checkNoShow(missionId: number) {

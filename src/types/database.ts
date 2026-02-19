@@ -421,7 +421,7 @@ export type Database = {
         Row: {
           id: number;
           user_id: string;
-          type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired";
+          type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired" | "no_show";
           title: string;
           body: string;
           related_match_id: number | null;
@@ -432,7 +432,7 @@ export type Database = {
         Insert: {
           id?: number;
           user_id: string;
-          type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired";
+          type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired" | "no_show";
           title: string;
           body: string;
           related_match_id?: number | null;
@@ -573,7 +573,7 @@ export type Database = {
       question_category: "values" | "lifestyle" | "romance" | "personality" | "taste";
       match_status: "pending" | "accepted" | "rejected" | "expired" | "completed";
       report_type: "harassment" | "inappropriate" | "no_show" | "safety" | "other";
-      notification_type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired";
+      notification_type: "match_new" | "match_accepted" | "match_rejected" | "mission_created" | "match_expired" | "no_show";
     };
     CompositeTypes: Record<string, never>;
   };
