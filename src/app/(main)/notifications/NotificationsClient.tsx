@@ -87,6 +87,7 @@ export default function NotificationsClient({
 }) {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState("");
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
@@ -100,9 +101,14 @@ export default function NotificationsClient({
   };
 
   const handleMarkAllAsRead = () => {
+    setError("");
     startTransition(async () => {
-      await markAllAsRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      const result = await markAllAsRead();
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      }
     });
   };
 
@@ -116,10 +122,13 @@ export default function NotificationsClient({
             disabled={isPending}
             className="text-xs text-stranger-accent disabled:opacity-50"
           >
-            모두 읽음 처리
+            {isPending ? "처리 중..." : "모두 읽음 처리"}
           </button>
         )}
       </div>
+      {error && (
+        <p className="mt-2 text-xs text-red-400">{error}</p>
+      )}
 
       {notifications.length === 0 ? (
         <div className="mt-12 text-center">

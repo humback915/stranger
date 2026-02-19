@@ -46,6 +46,13 @@ export default async function ChatPage({ params }: ChatPageProps) {
   const partnerId =
     match.user_a_id === user.id ? match.user_b_id : match.user_a_id;
 
+  // 파트너 프로필 조회
+  const { data: partnerProfile } = await supabase
+    .from("profiles")
+    .select("nickname, gender")
+    .eq("id", partnerId)
+    .single();
+
   // 초기 메시지 로드
   const { messages } = await getMessages(matchId);
 
@@ -62,8 +69,12 @@ export default async function ChatPage({ params }: ChatPageProps) {
           </svg>
         </a>
         <div>
-          <p className="text-sm font-semibold text-stranger-light">채팅</p>
-          <p className="text-xs text-gray-400">매칭 #{matchId}</p>
+          <p className="text-sm font-semibold text-stranger-light">
+            {partnerProfile?.nickname ?? "상대방"}
+          </p>
+          <p className="text-xs text-gray-400">
+            {partnerProfile?.gender === "male" ? "남성" : partnerProfile?.gender === "female" ? "여성" : ""}
+          </p>
         </div>
       </div>
 
