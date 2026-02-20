@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import QuestionCard from "@/components/questions/QuestionCard";
 import CustomQuestionForm from "@/components/questions/CustomQuestionForm";
 import CustomQuestionCard from "@/components/questions/CustomQuestionCard";
@@ -72,6 +73,7 @@ export default function QuestionsClient({
   customQuestionsToAnswer,
   answeredCustomQuestions,
 }: QuestionsClientProps) {
+  const t = useTranslations("questions");
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("basic");
   const [answeredMap, setAnsweredMap] = useState<Record<number, string>>(
@@ -96,20 +98,16 @@ export default function QuestionsClient({
     totalCount > 0 ? Math.round((answeredCount / totalCount) * 100) : 0;
 
   const tabs: { key: Tab; label: string; badge?: number }[] = [
-    { key: "basic", label: "기본 질문", badge: unanswered.length || undefined },
-    { key: "custom", label: "내 질문", badge: myCustomQuestions.length || undefined },
-    {
-      key: "answer",
-      label: "답변하기",
-      badge: customQuestionsToAnswer.length || undefined,
-    },
+    { key: "basic", label: t("tab_basic"), badge: unanswered.length || undefined },
+    { key: "custom", label: t("tab_custom"), badge: myCustomQuestions.length || undefined },
+    { key: "answer", label: t("tab_answer"), badge: customQuestionsToAnswer.length || undefined },
   ];
 
   return (
     <div className="px-4 pb-24 pt-6">
-      <h1 className="text-2xl font-bold text-stranger-light">질문</h1>
+      <h1 className="text-2xl font-bold text-stranger-light">{t("title")}</h1>
       <p className="mt-1 text-sm text-gray-400">
-        질문에 답하고 나만의 질문도 만들어보세요
+        {t("subtitle")}
       </p>
 
       {/* 탭 */}
@@ -140,7 +138,7 @@ export default function QuestionsClient({
           {/* 진행도 바 */}
           <div className="mt-4 rounded-xl bg-stranger-mid p-4">
             <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="text-gray-400">답변 진행도</span>
+              <span className="text-gray-400">{t("progress_label")}</span>
               <span className="font-medium text-stranger-accent">
                 {answeredCount} / {totalCount}
               </span>
@@ -156,7 +154,7 @@ export default function QuestionsClient({
           {unanswered.length > 0 && (
             <div className="mt-4">
               <h2 className="mb-3 text-sm font-medium text-gray-400">
-                아직 답변하지 않은 질문
+                {t("unanswered_section")}
               </h2>
               <div className="flex flex-col gap-3">
                 {unanswered.map((q, i) => (
@@ -191,10 +189,10 @@ export default function QuestionsClient({
                 </svg>
               </div>
               <h3 className="text-lg font-bold text-stranger-light">
-                모든 질문에 답변했어요!
+                {t("all_answered_title")}
               </h3>
               <p className="mt-1 text-sm text-gray-400">
-                답변을 바탕으로 가장 잘 맞는 상대를 찾고 있어요
+                {t("all_answered_desc")}
               </p>
             </div>
           )}
@@ -202,7 +200,7 @@ export default function QuestionsClient({
           {answered.length > 0 && (
             <div className="mt-6">
               <h2 className="mb-3 text-sm font-medium text-gray-400">
-                답변 완료 ({answered.length})
+                {t("answered_section", { count: answered.length })}
               </h2>
               <div className="flex flex-col gap-3">
                 {answered.map((q, i) => (
@@ -229,7 +227,7 @@ export default function QuestionsClient({
           {myCustomQuestions.length > 0 && (
             <div className="mt-4">
               <h2 className="mb-3 text-sm font-medium text-gray-400">
-                내가 만든 질문 ({myCustomQuestions.length}/10)
+                {t("my_questions_section", { count: myCustomQuestions.length })}
               </h2>
               <div className="flex flex-col gap-3">
                 {myCustomQuestions.map((q) => (
@@ -239,7 +237,7 @@ export default function QuestionsClient({
                   >
                     <div className="mb-2 flex items-center justify-between">
                       <span className="rounded-md bg-purple-500/20 px-2 py-0.5 text-xs text-purple-400">
-                        내 질문
+                        {t("my_question_badge")}
                       </span>
                       <button
                         onClick={async () => {
@@ -265,7 +263,7 @@ export default function QuestionsClient({
                         A. {q.option_a}
                         {q.preferred_answer === "a" && (
                           <span className="ml-2 text-stranger-accent">
-                            (선호)
+                            {t("preferred_label")}
                           </span>
                         )}
                       </div>
@@ -279,7 +277,7 @@ export default function QuestionsClient({
                         B. {q.option_b}
                         {q.preferred_answer === "b" && (
                           <span className="ml-2 text-stranger-accent">
-                            (선호)
+                            {t("preferred_label")}
                           </span>
                         )}
                       </div>
@@ -292,10 +290,8 @@ export default function QuestionsClient({
 
           {myCustomQuestions.length === 0 && (
             <div className="mt-4 rounded-2xl bg-stranger-mid p-6 text-center">
-              <p className="text-sm text-gray-400">
-                아직 만든 질문이 없어요.
-                <br />
-                상대에게 물어보고 싶은 질문을 만들어보세요!
+              <p className="text-sm text-gray-400 whitespace-pre-line">
+                {t("no_custom_questions")}
               </p>
             </div>
           )}
@@ -308,7 +304,7 @@ export default function QuestionsClient({
           {customQuestionsToAnswer.length > 0 && (
             <>
               <h2 className="text-sm font-medium text-gray-400">
-                답변을 기다리는 질문 ({customQuestionsToAnswer.length})
+                {t("pending_answers_section", { count: customQuestionsToAnswer.length })}
               </h2>
               {customQuestionsToAnswer.map((q) => (
                 <CustomQuestionCard
@@ -322,10 +318,8 @@ export default function QuestionsClient({
 
           {customQuestionsToAnswer.length === 0 && (
             <div className="rounded-2xl bg-stranger-mid p-6 text-center">
-              <p className="text-sm text-gray-400">
-                현재 답변할 질문이 없어요.
-                <br />
-                다른 사용자가 질문을 만들면 여기에 나타나요!
+              <p className="text-sm text-gray-400 whitespace-pre-line">
+                {t("no_pending_answers")}
               </p>
             </div>
           )}
@@ -333,7 +327,7 @@ export default function QuestionsClient({
           {answeredCustomQuestions.length > 0 && (
             <div className="mt-4">
               <h2 className="mb-3 text-sm font-medium text-gray-400">
-                답변 완료 ({answeredCustomQuestions.length})
+                {t("answered_others_section", { count: answeredCustomQuestions.length })}
               </h2>
               {answeredCustomQuestions.map((q) => (
                 <CustomQuestionCard

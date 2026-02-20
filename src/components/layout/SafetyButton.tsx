@@ -1,20 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { submitSafetyReport } from "@/actions/safety";
 import { REPORT_TYPES } from "@/lib/validations/safety";
-
-const REPORT_TYPE_LABELS: Record<string, string> = {
-  harassment: "성희롱/괴롭힘",
-  inappropriate: "부적절한 행동",
-  no_show: "노쇼 (약속 불이행)",
-  safety: "안전 위협",
-  other: "기타",
-};
 
 type Step = "main" | "report_form" | "done";
 
 export default function SafetyButton() {
+  const t = useTranslations("safety");
+  const tCommon = useTranslations("common");
   const [step, setStep] = useState<Step>("main");
   const [showModal, setShowModal] = useState(false);
   const [reportType, setReportType] = useState<string>("");
@@ -33,7 +28,7 @@ export default function SafetyButton() {
 
   const handleSubmitReport = () => {
     if (!reportType) {
-      setError("신고 유형을 선택해주세요");
+      setError(t("error_select_type"));
       return;
     }
 
@@ -74,7 +69,7 @@ export default function SafetyButton() {
       <button
         onClick={() => setShowModal(true)}
         className="fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition-transform hover:scale-110 active:scale-95"
-        aria-label="긴급 신고"
+        aria-label={t("emergency_title")}
       >
         <svg
           className="h-6 w-6"
@@ -97,30 +92,29 @@ export default function SafetyButton() {
             {step === "main" && (
               <>
                 <h3 className="mb-2 text-lg font-bold text-stranger-light">
-                  긴급 신고
+                  {t("emergency_title")}
                 </h3>
                 <p className="mb-6 text-sm text-gray-400">
-                  위험한 상황이거나 불편함을 느끼셨나요?
-                  신고하시면 즉시 조치하겠습니다.
+                  {t("emergency_desc")}
                 </p>
                 <div className="flex flex-col gap-2">
                   <a
                     href="tel:112"
                     className="block rounded-lg bg-red-600 py-3 text-center text-sm font-medium text-white"
                   >
-                    112 긴급 신고
+                    {t("emergency_call")}
                   </a>
                   <button
                     onClick={() => setStep("report_form")}
                     className="rounded-lg bg-stranger-accent py-3 text-sm font-medium text-white"
                   >
-                    상대방 신고하기
+                    {t("report_partner_btn")}
                   </button>
                   <button
                     onClick={reset}
                     className="rounded-lg py-3 text-sm text-gray-400"
                   >
-                    닫기
+                    {tCommon("close")}
                   </button>
                 </div>
               </>
@@ -129,7 +123,7 @@ export default function SafetyButton() {
             {step === "report_form" && (
               <>
                 <h3 className="mb-4 text-lg font-bold text-stranger-light">
-                  상대방 신고
+                  {t("report_partner_title")}
                 </h3>
 
                 <div className="mb-4 flex flex-col gap-2">
@@ -146,7 +140,7 @@ export default function SafetyButton() {
                           : "border-gray-600 text-gray-400 hover:border-gray-500"
                       }`}
                     >
-                      {REPORT_TYPE_LABELS[type]}
+                      {t(`report_types.${type}` as Parameters<typeof t>[0])}
                     </button>
                   ))}
                 </div>
@@ -154,7 +148,7 @@ export default function SafetyButton() {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="상세 설명 (선택, 500자 이내)"
+                  placeholder={t("detail_optional_placeholder")}
                   maxLength={500}
                   className="mb-4 w-full rounded-lg border border-gray-600 bg-stranger-dark p-3 text-sm text-stranger-light placeholder:text-gray-500 focus:border-stranger-accent focus:outline-none"
                   rows={3}
@@ -164,7 +158,6 @@ export default function SafetyButton() {
                   type="text"
                   value={reportedUserId}
                   onChange={(e) => setReportedUserId(e.target.value)}
-                  placeholder="상대방 ID (자동 입력됨)"
                   className="mb-4 hidden"
                 />
 
@@ -178,7 +171,7 @@ export default function SafetyButton() {
                     disabled={isPending}
                     className="rounded-lg bg-red-600 py-3 text-sm font-medium text-white disabled:opacity-50"
                   >
-                    {isPending ? "신고 중..." : "신고 제출"}
+                    {isPending ? t("report_doing") : t("report_submit")}
                   </button>
                   <button
                     onClick={() => {
@@ -187,7 +180,7 @@ export default function SafetyButton() {
                     }}
                     className="rounded-lg py-3 text-sm text-gray-400"
                   >
-                    뒤로
+                    {tCommon("back")}
                   </button>
                 </div>
               </>
@@ -213,16 +206,16 @@ export default function SafetyButton() {
                   </div>
                 </div>
                 <h3 className="mb-2 text-center text-lg font-bold text-stranger-light">
-                  신고가 접수되었습니다
+                  {t("done_title")}
                 </h3>
                 <p className="mb-6 text-center text-sm text-gray-400">
-                  신속하게 검토 후 조치하겠습니다.
+                  {t("done_desc")}
                 </p>
                 <button
                   onClick={reset}
                   className="w-full rounded-lg bg-stranger-accent py-3 text-sm font-medium text-white"
                 >
-                  확인
+                  {tCommon("confirm")}
                 </button>
               </>
             )}

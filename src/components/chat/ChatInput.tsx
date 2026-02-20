@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { sendMessage } from "@/actions/chat";
 
 interface ChatInputProps {
@@ -8,6 +9,7 @@ interface ChatInputProps {
 }
 
 export default function ChatInput({ matchId }: ChatInputProps) {
+  const t = useTranslations("chat");
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -45,7 +47,7 @@ export default function ChatInput({ matchId }: ChatInputProps) {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="메시지를 입력하세요 (Enter: 전송, Shift+Enter: 줄바꿈)"
+          placeholder={t("placeholder")}
           rows={1}
           maxLength={500}
           className="flex-1 resize-none rounded-xl bg-stranger-mid px-4 py-2.5 text-sm text-stranger-light placeholder-gray-500 outline-none focus:ring-1 focus:ring-stranger-accent"

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { ROUTES } from "@/lib/constants/routes";
 import Button from "@/components/ui/Button";
 import PageTransition from "@/components/motion/PageTransition";
@@ -14,6 +15,8 @@ const OCCUPATIONS = [
 
 export default function OccupationStep() {
   const router = useRouter();
+  const t = useTranslations("onboarding");
+  const tCommon = useTranslations("common");
   const [selected, setSelected] = useState("");
   const [custom, setCustom] = useState("");
   const [showCustom, setShowCustom] = useState(false);
@@ -58,7 +61,7 @@ export default function OccupationStep() {
   return (
     <PageTransition>
       <h2 className="mb-8 text-2xl font-bold text-stranger-light">
-        직업을 선택해주세요
+        {t("occupation_title")}
       </h2>
 
       <div className="flex flex-wrap gap-2">
@@ -81,7 +84,7 @@ export default function OccupationStep() {
       {showCustom && (
         <input
           type="text"
-          placeholder="직업을 입력해주세요"
+          placeholder={t("occupation_placeholder")}
           value={custom}
           onChange={(e) => setCustom(e.target.value)}
           maxLength={50}
@@ -96,7 +99,7 @@ export default function OccupationStep() {
         className="mt-8 w-full"
         size="lg"
       >
-        다음
+        {tCommon("next")}
       </Button>
     </PageTransition>
   );

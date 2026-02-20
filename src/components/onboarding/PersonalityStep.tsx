@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { PERSONALITIES } from "@/lib/constants/personality";
 import { ROUTES } from "@/lib/constants/routes";
 import Button from "@/components/ui/Button";
@@ -11,6 +12,8 @@ const MAX_SELECT = 5;
 
 export default function PersonalityStep() {
   const router = useRouter();
+  const t = useTranslations("onboarding");
+  const tCommon = useTranslations("common");
   const [selected, setSelected] = useState<string[]>([]);
 
   useEffect(() => {
@@ -40,10 +43,10 @@ export default function PersonalityStep() {
   return (
     <PageTransition>
       <h2 className="mb-2 text-2xl font-bold text-stranger-light">
-        나의 성격은?
+        {t("personality_title")}
       </h2>
       <p className="mb-6 text-sm text-gray-400">
-        최대 {MAX_SELECT}개까지 선택할 수 있어요 ({selected.length}/{MAX_SELECT})
+        {t("hobbies_max_hint", { max: MAX_SELECT, current: selected.length })}
       </p>
 
       <div className="flex flex-wrap gap-2">
@@ -70,14 +73,14 @@ export default function PersonalityStep() {
           className="w-full"
           size="lg"
         >
-          다음
+          {tCommon("next")}
         </Button>
         <button
           type="button"
           onClick={() => handleNext(true)}
           className="text-sm text-gray-400 hover:text-stranger-light transition-colors"
         >
-          건너뛰기
+          {tCommon("skip")}
         </button>
       </div>
     </PageTransition>

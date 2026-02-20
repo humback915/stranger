@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PLACE_CATEGORY_LABELS } from "@/lib/constants/places";
-import { PROP_CATEGORY_LABELS } from "@/lib/constants/props";
+import { useTranslations } from "next-intl";
 import type { PlaceCategory } from "@/lib/constants/places";
 import type { PropCategory } from "@/lib/constants/props";
 import DepartureConfirmation from "./DepartureConfirmation";
@@ -40,6 +39,25 @@ interface MissionCardProps {
 }
 
 export default function MissionCard({ mission, role, partnerNickname, partnerId }: MissionCardProps) {
+  const t = useTranslations("mission");
+  const tPlace = useTranslations("place_categories");
+  const tProp = useTranslations("prop_categories");
+  const placeCategoryLabels: Record<string, string> = {
+    cafe: tPlace("cafe"),
+    bookstore: tPlace("bookstore"),
+    park: tPlace("park"),
+    museum: tPlace("museum"),
+    library: tPlace("library"),
+    mall: tPlace("mall"),
+    restaurant: tPlace("restaurant"),
+  };
+  const propCategoryLabels: Record<string, string> = {
+    clothing_color: tProp("clothing_color"),
+    phone_screen: tProp("phone_screen"),
+    convenience_item: tProp("convenience_item"),
+    accessory: tProp("accessory"),
+    book_magazine: tProp("book_magazine"),
+  };
   const isUserA = role === "user_a";
   const [reportOpen, setReportOpen] = useState(false);
   const myPropCategory = isUserA
@@ -76,7 +94,7 @@ export default function MissionCard({ mission, role, partnerNickname, partnerId 
       <div>
         <div className="mb-1 flex items-center gap-2">
           <span className="rounded-md bg-stranger-accent/20 px-2 py-0.5 text-xs text-stranger-accent">
-            {PLACE_CATEGORY_LABELS[mission.place_category as PlaceCategory] ??
+            {placeCategoryLabels[mission.place_category as PlaceCategory] ??
               mission.place_category}
           </span>
         </div>
@@ -124,7 +142,7 @@ export default function MissionCard({ mission, role, partnerNickname, partnerId 
       {/* 상대 닉네임 */}
       {partnerNickname && (
         <div className="rounded-lg bg-stranger-mid px-4 py-3">
-          <p className="mb-1 text-xs text-gray-400">상대방</p>
+          <p className="mb-1 text-xs text-gray-400">{t("partner")}</p>
           <p className="text-sm font-bold text-stranger-accent">{partnerNickname}</p>
         </div>
       )}
@@ -132,8 +150,8 @@ export default function MissionCard({ mission, role, partnerNickname, partnerId 
       {/* 나의 소품 */}
       <div className="rounded-lg bg-stranger-mid px-4 py-3">
         <p className="mb-1 text-xs text-gray-400">
-          나의 식별 소품 (
-          {PROP_CATEGORY_LABELS[myPropCategory as PropCategory] ??
+          {t("your_props")} (
+          {propCategoryLabels[myPropCategory as PropCategory] ??
             myPropCategory}
           )
         </p>
@@ -151,7 +169,7 @@ export default function MissionCard({ mission, role, partnerNickname, partnerId 
       {/* 나의 식별 행동 */}
       {myAction && (
         <div className="rounded-lg bg-stranger-mid px-4 py-3">
-          <p className="mb-1 text-xs text-gray-400">나의 식별 행동</p>
+          <p className="mb-1 text-xs text-gray-400">{t("my_action")}</p>
           <p className="text-sm font-medium text-stranger-light">{myAction}</p>
         </div>
       )}
@@ -173,7 +191,7 @@ export default function MissionCard({ mission, role, partnerNickname, partnerId 
           onClick={() => setReportOpen(true)}
           className="mt-2 w-full text-center text-xs text-gray-600 hover:text-red-400"
         >
-          이 상대방 신고하기
+          {t("report")}
         </button>
       )}
 

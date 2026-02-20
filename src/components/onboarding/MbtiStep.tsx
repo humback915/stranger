@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { MBTI_TYPES, MBTI_LABELS, type MbtiType } from "@/lib/constants/mbti";
 import { ROUTES } from "@/lib/constants/routes";
 import Button from "@/components/ui/Button";
@@ -9,6 +10,8 @@ import PageTransition from "@/components/motion/PageTransition";
 
 export default function MbtiStep() {
   const router = useRouter();
+  const t = useTranslations("onboarding");
+  const tCommon = useTranslations("common");
   const [selected, setSelected] = useState<MbtiType | null>(null);
 
   useEffect(() => {
@@ -28,10 +31,10 @@ export default function MbtiStep() {
   return (
     <PageTransition>
       <h2 className="mb-2 text-2xl font-bold text-stranger-light">
-        MBTI를 선택해주세요
+        {t("mbti_title")}
       </h2>
       <p className="mb-6 text-sm text-gray-400">
-        잘 모르겠다면 건너뛰어도 괜찮아요
+        {t("mbti_skip_hint")}
       </p>
 
       <div className="grid grid-cols-4 gap-2">
@@ -61,14 +64,14 @@ export default function MbtiStep() {
           className="w-full"
           size="lg"
         >
-          다음
+          {tCommon("next")}
         </Button>
         <button
           type="button"
           onClick={() => handleNext(true)}
           className="text-sm text-gray-400 hover:text-stranger-light transition-colors"
         >
-          건너뛰기
+          {tCommon("skip")}
         </button>
       </div>
     </PageTransition>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { createProfile } from "@/actions/profile";
 import { ROUTES } from "@/lib/constants/routes";
 import Button from "@/components/ui/Button";
@@ -9,6 +10,8 @@ import PageTransition from "@/components/motion/PageTransition";
 
 export default function PreferencesStep() {
   const router = useRouter();
+  const t = useTranslations("onboarding");
+  const tGender = useTranslations("gender");
   const [preferredGender, setPreferredGender] = useState<
     "male" | "female" | "any"
   >("any");
@@ -66,20 +69,20 @@ export default function PreferencesStep() {
   return (
     <PageTransition>
       <h2 className="mb-8 text-2xl font-bold text-stranger-light">
-        어떤 상대를 만나고 싶나요?
+        {t("preferences_question")}
       </h2>
 
       <div className="flex flex-col gap-6">
         {/* 선호 성별 */}
         <div>
-          <label className="mb-2 block text-sm text-gray-400">선호 성별</label>
+          <label className="mb-2 block text-sm text-gray-400">{t("preferred_gender")}</label>
           <div className="flex gap-2">
             {(
               [
-                { value: "male", label: "남성" },
-                { value: "female", label: "여성" },
-                { value: "any", label: "상관없음" },
-              ] as const
+                { value: "male" as const, label: tGender("male") },
+                { value: "female" as const, label: tGender("female") },
+                { value: "any" as const, label: tGender("any") },
+              ]
             ).map((option) => (
               <button
                 key={option.value}
@@ -100,7 +103,7 @@ export default function PreferencesStep() {
         {/* 선호 나이 */}
         <div>
           <label className="mb-2 block text-sm text-gray-400">
-            선호 나이 ({ageMin}세 ~ {ageMax}세)
+            {t("preferred_age", { min: ageMin, max: ageMax })}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -126,7 +129,7 @@ export default function PreferencesStep() {
         {/* 선호 거리 */}
         <div>
           <label className="mb-2 block text-sm text-gray-400">
-            최대 거리 ({distance}km)
+            {t("preferred_distance", { km: distance })}
           </label>
           <input
             type="range"
@@ -150,7 +153,7 @@ export default function PreferencesStep() {
           className="mt-4 w-full"
           size="lg"
         >
-          프로필 완성하기
+          {t("complete_profile_btn")}
         </Button>
       </div>
     </PageTransition>

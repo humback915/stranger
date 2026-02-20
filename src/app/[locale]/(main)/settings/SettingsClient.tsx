@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { signOut } from "@/actions/auth";
 import { updateProfile } from "@/actions/profile";
 import { ROUTES } from "@/lib/constants/routes";
@@ -11,6 +12,7 @@ import { HOBBIES } from "@/lib/constants/hobbies";
 import { PERSONALITIES } from "@/lib/constants/personality";
 import { IDEAL_TYPES } from "@/lib/constants/ideal-type";
 import PhotoEditor from "@/components/profile/PhotoEditor";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 interface Profile {
   id: string;
@@ -34,17 +36,13 @@ interface Profile {
   created_at: string;
 }
 
-const GENDER_LABELS: Record<string, string> = {
-  male: "남성",
-  female: "여성",
-  any: "무관",
-};
-
 interface SettingsClientProps {
   profile: Profile;
 }
 
 export default function SettingsClient({ profile }: SettingsClientProps) {
+  const t = useTranslations("settings");
+  const gt = useTranslations("gender");
   const router = useRouter();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -52,7 +50,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
   const [matchingStatus, setMatchingStatus] = useState(profile.status);
   const [statusPending, startStatusTransition] = useTransition();
   const [isPhotoEditing, setIsPhotoEditing] = useState(false);
-  const [currentPhotos, setCurrentPhotos] = useState(profile.photo_urls ?? []);
+  const [currentPhotos] = useState(profile.photo_urls ?? []);
 
   // 수정 가능한 필드 상태
   const [nickname, setNickname] = useState(profile.nickname);
@@ -141,7 +139,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
       if (result.error) {
         setSaveMessage(result.error);
       } else {
-        setSaveMessage("저장되었습니다");
+        setSaveMessage(t("save_success"));
         setIsEditing(false);
         router.refresh();
       }
@@ -152,32 +150,32 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
     return (
       <div className="px-4 pb-24 pt-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-stranger-light">프로필 수정</h1>
+          <h1 className="text-2xl font-bold text-stranger-light">{t("edit_title")}</h1>
           <button
             onClick={handleCancelEdit}
             className="text-sm text-gray-400"
           >
-            취소
+            {t("logout_cancel")}
           </button>
         </div>
 
         <div className="mt-6 space-y-5">
           {/* 닉네임 */}
           <div>
-            <label className="mb-1.5 block text-xs text-gray-400">닉네임</label>
+            <label className="mb-1.5 block text-xs text-gray-400">{t("nickname_label")}</label>
             <input
               type="text"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={20}
-              placeholder="닉네임을 입력하세요"
+              placeholder={t("nickname_placeholder")}
               className="w-full rounded-xl bg-stranger-mid px-4 py-3 text-sm text-stranger-light outline-none focus:ring-1 focus:ring-stranger-accent"
             />
           </div>
 
           {/* 직업 */}
           <div>
-            <label className="mb-1.5 block text-xs text-gray-400">직업</label>
+            <label className="mb-1.5 block text-xs text-gray-400">{t("occupation_label")}</label>
             <input
               type="text"
               value={occupation}
@@ -189,7 +187,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
 
           {/* MBTI */}
           <div>
-            <label className="mb-1.5 block text-xs text-gray-400">MBTI</label>
+            <label className="mb-1.5 block text-xs text-gray-400">{t("mbti_label")}</label>
             <div className="grid grid-cols-4 gap-2">
               <button
                 onClick={() => setMbti("")}
@@ -199,7 +197,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
                     : "bg-stranger-mid text-gray-400"
                 }`}
               >
-                미설정
+                {t("mbti_unset")}
               </button>
               {MBTI_TYPES.map((type) => (
                 <button
@@ -219,8 +217,8 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
 
           {/* 취미 */}
           <TagEditor
-            label="취미"
-            subtitle="최대 5개"
+            label={t("hobbies_label")}
+            subtitle={t("max_count")}
             items={HOBBIES}
             selected={hobbies}
             onToggle={(item) =>
@@ -237,8 +235,8 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
 
           {/* 성격 */}
           <TagEditor
-            label="성격"
-            subtitle="최대 5개"
+            label={t("personality_label")}
+            subtitle={t("max_count")}
             items={PERSONALITIES}
             selected={personality}
             onToggle={(item) =>
@@ -255,8 +253,8 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
 
           {/* 이상형 */}
           <TagEditor
-            label="이상형"
-            subtitle="최대 5개"
+            label={t("ideal_type_label")}
+            subtitle={t("max_count")}
             items={IDEAL_TYPES}
             selected={idealType}
             onToggle={(item) =>
@@ -274,7 +272,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
           {/* 활동 지역 */}
           <div>
             <label className="mb-1.5 block text-xs text-gray-400">
-              활동 지역
+              {t("activity_area_label")}
             </label>
             <select
               value={activityArea}
@@ -296,13 +294,13 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
           {/* 매칭 선호 설정 */}
           <div className="rounded-2xl bg-stranger-mid p-5">
             <h2 className="mb-4 text-sm font-bold text-stranger-light">
-              매칭 선호 설정
+              {t("matching_preferences")}
             </h2>
 
             {/* 선호 성별 */}
             <div className="mb-4">
               <label className="mb-1.5 block text-xs text-gray-400">
-                선호 성별
+                {t("preferred_gender_label")}
               </label>
               <div className="flex gap-2">
                 {(["any", "male", "female"] as const).map((g) => (
@@ -315,7 +313,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
                         : "bg-stranger-dark text-gray-400"
                     }`}
                   >
-                    {GENDER_LABELS[g]}
+                    {gt(g)}
                   </button>
                 ))}
               </div>
@@ -324,7 +322,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
             {/* 선호 나이 */}
             <div className="mb-4">
               <label className="mb-1.5 block text-xs text-gray-400">
-                선호 나이: {preferredAgeMin}세 ~ {preferredAgeMax}세
+                {t("preferred_age_label", { min: preferredAgeMin, max: preferredAgeMax })}
               </label>
               <div className="flex items-center gap-3">
                 <input
@@ -350,7 +348,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
             {/* 선호 거리 */}
             <div>
               <label className="mb-1.5 block text-xs text-gray-400">
-                선호 거리: {preferredDistanceKm}km 이내
+                {t("preferred_distance_label", { km: preferredDistanceKm })}
               </label>
               <input
                 type="range"
@@ -374,13 +372,13 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
             disabled={isPending || !nickname.trim() || !occupation.trim()}
             className="w-full rounded-xl bg-stranger-accent py-3 text-sm font-medium text-white transition-opacity disabled:opacity-50"
           >
-            {isPending ? "저장 중..." : "저장하기"}
+            {isPending ? t("saving") : t("save_btn")}
           </button>
 
           {saveMessage && (
             <p
               className={`text-center text-sm ${
-                saveMessage.includes("저장") ? "text-green-400" : "text-red-400"
+                saveMessage === t("save_success") ? "text-green-400" : "text-red-400"
               }`}
             >
               {saveMessage}
@@ -393,8 +391,8 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
 
   return (
     <div className="px-4 pb-24 pt-6">
-      <h1 className="text-2xl font-bold text-stranger-light">설정</h1>
-      <p className="mt-1 text-sm text-gray-400">프로필 및 앱 설정을 관리하세요</p>
+      <h1 className="text-2xl font-bold text-stranger-light">{t("title")}</h1>
+      <p className="mt-1 text-sm text-gray-400">{t("subtitle")}</p>
 
       {saveMessage && (
         <div className="mt-3 rounded-lg bg-green-600/10 px-4 py-2.5 text-sm text-green-400">
@@ -414,7 +412,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
                 {profile.nickname} · {age}세
               </p>
               <p className="text-xs text-gray-400">
-                {profile.occupation} · {profile.mbti ?? "MBTI 미설정"}
+                {profile.occupation} · {profile.mbti ?? t("mbti_not_set")}
               </p>
             </div>
           </div>
@@ -422,7 +420,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
             onClick={() => setIsEditing(true)}
             className="rounded-lg bg-stranger-dark px-3 py-1.5 text-xs text-stranger-accent"
           >
-            수정
+            {t("edit_title")}
           </button>
         </div>
 
@@ -438,7 +436,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
                 />
                 {i === 0 && (
                   <span className="absolute bottom-0.5 left-0.5 rounded bg-stranger-accent/90 px-1 py-0.5 text-[8px] text-white">
-                    대표
+                    {t("photo_representative")}
                   </span>
                 )}
               </div>
@@ -452,7 +450,7 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
             onClick={() => setIsPhotoEditing(true)}
             className="mb-3 w-full rounded-lg border border-dashed border-gray-600 py-2 text-xs text-gray-400 hover:border-stranger-accent hover:text-stranger-accent"
           >
-            사진 관리 ({currentPhotos.length}/{5})
+            {t("photo_manage", { current: currentPhotos.length, max: 5 })}
           </button>
         ) : (
           <PhotoEditor
@@ -466,16 +464,16 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
         )}
 
         <div className="space-y-3">
-          <InfoRow label="닉네임" value={profile.nickname} />
-          <InfoRow label="전화번호" value={formatPhone(profile.phone)} />
-          <InfoRow label="성별" value={GENDER_LABELS[profile.gender]} />
-          <InfoRow label="출생연도" value={`${profile.birth_year}년`} />
-          <InfoRow label="직업" value={profile.occupation} />
-          <InfoRow label="MBTI" value={profile.mbti ?? "미설정"} />
-          <InfoRow label="활동 지역" value={profile.activity_area} />
-          <TagRow label="취미" tags={profile.hobbies} color="text-stranger-accent" bgColor="bg-stranger-accent/15" />
-          <TagRow label="성격" tags={profile.personality} color="text-purple-400" bgColor="bg-purple-500/15" />
-          <TagRow label="이상형" tags={profile.ideal_type} color="text-pink-400" bgColor="bg-pink-500/15" />
+          <InfoRow label={t("info_nickname")} value={profile.nickname} />
+          <InfoRow label={t("info_phone")} value={formatPhone(profile.phone)} />
+          <InfoRow label={t("info_gender")} value={gt(profile.gender)} />
+          <InfoRow label={t("info_birth_year")} value={t("info_birth_year_value", { year: profile.birth_year })} />
+          <InfoRow label={t("info_occupation")} value={profile.occupation} />
+          <InfoRow label={t("info_mbti")} value={profile.mbti ?? t("info_mbti_unset")} />
+          <InfoRow label={t("info_area")} value={profile.activity_area} />
+          <TagRow label={t("info_hobbies")} tags={profile.hobbies} color="text-stranger-accent" bgColor="bg-stranger-accent/15" />
+          <TagRow label={t("info_personality")} tags={profile.personality} color="text-purple-400" bgColor="bg-purple-500/15" />
+          <TagRow label={t("info_ideal_type")} tags={profile.ideal_type} color="text-pink-400" bgColor="bg-pink-500/15" />
         </div>
       </div>
 
@@ -483,43 +481,43 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
       <div className="mt-4 rounded-2xl bg-stranger-mid p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-bold text-stranger-light">
-            매칭 선호 설정
+            {t("matching_preferences")}
           </h2>
           <button
             onClick={() => setIsEditing(true)}
             className="text-xs text-stranger-accent"
           >
-            수정
+            {t("edit_title")}
           </button>
         </div>
         <div className="space-y-3">
           <InfoRow
-            label="선호 성별"
-            value={GENDER_LABELS[profile.preferred_gender]}
+            label={t("preferred_gender_value")}
+            value={gt(profile.preferred_gender)}
           />
           <InfoRow
-            label="선호 나이"
-            value={`${profile.preferred_age_min}세 ~ ${profile.preferred_age_max}세`}
+            label={t("info_nickname")}
+            value={t("preferred_age_value", { min: profile.preferred_age_min, max: profile.preferred_age_max })}
           />
           <InfoRow
-            label="선호 거리"
-            value={`${profile.preferred_distance_km}km 이내`}
+            label={t("preferred_gender_value")}
+            value={t("preferred_distance_value", { km: profile.preferred_distance_km })}
           />
         </div>
       </div>
 
       {/* 매칭 상태 */}
       <div className="mt-4 rounded-2xl bg-stranger-mid p-5">
-        <h2 className="mb-3 text-sm font-bold text-stranger-light">매칭 설정</h2>
+        <h2 className="mb-3 text-sm font-bold text-stranger-light">{t("matching_section")}</h2>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-stranger-light">매칭 활성화</p>
+            <p className="text-sm text-stranger-light">{t("matching_active")}</p>
             <p className="text-xs text-gray-400">
               {matchingStatus === "active"
-                ? "현재 매칭 상대를 찾고 있습니다"
+                ? t("matching_active_desc")
                 : matchingStatus === "paused"
-                  ? "매칭이 일시정지 상태입니다"
-                  : "계정이 정지되어 매칭할 수 없습니다"}
+                  ? t("matching_paused_desc")
+                  : t("matching_banned_desc")}
             </p>
           </div>
           <button
@@ -541,17 +539,17 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
       {/* 계정 상태 */}
       <div className="mt-4 rounded-2xl bg-stranger-mid p-5">
         <h2 className="mb-3 text-sm font-bold text-stranger-light">
-          계정 정보
+          {t("account_section")}
         </h2>
         <div className="space-y-3">
           <InfoRow
-            label="계정 상태"
+            label={t("account_status")}
             value={
               matchingStatus === "active"
-                ? "활성"
+                ? t("account_active")
                 : matchingStatus === "paused"
-                  ? "일시정지"
-                  : "정지됨"
+                  ? t("account_paused")
+                  : t("account_banned")
             }
             valueColor={
               matchingStatus === "active"
@@ -562,13 +560,21 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
             }
           />
           <InfoRow
-            label="노쇼 횟수"
-            value={`${profile.no_show_count}회`}
+            label={t("no_show_count")}
+            value={t("no_show_value", { count: profile.no_show_count })}
             valueColor={
               profile.no_show_count >= 2 ? "text-yellow-400" : undefined
             }
           />
-          <InfoRow label="가입일" value={joinDate} />
+          <InfoRow label={t("join_date")} value={joinDate} />
+        </div>
+      </div>
+
+      {/* 언어 설정 */}
+      <div className="mt-4 rounded-2xl bg-stranger-mid p-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-stranger-light">{t("language_label")}</h2>
+          <LanguageSwitcher />
         </div>
       </div>
 
@@ -579,26 +585,26 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
             onClick={() => setShowLogoutConfirm(true)}
             className="w-full rounded-xl border border-gray-600 py-3 text-sm text-gray-400 transition-colors hover:border-red-500 hover:text-red-400"
           >
-            로그아웃
+            {t("logout")}
           </button>
         ) : (
           <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4">
             <p className="mb-3 text-center text-sm text-stranger-light">
-              정말 로그아웃하시겠습니까?
+              {t("logout_confirm")}
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowLogoutConfirm(false)}
                 className="flex-1 rounded-lg border border-gray-600 py-2.5 text-sm text-gray-400"
               >
-                취소
+                {t("logout_cancel")}
               </button>
               <button
                 onClick={handleLogout}
                 disabled={isPending}
                 className="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-medium text-white disabled:opacity-50"
               >
-                {isPending ? "로그아웃 중..." : "로그아웃"}
+                {isPending ? t("logout_processing") : t("logout")}
               </button>
             </div>
           </div>

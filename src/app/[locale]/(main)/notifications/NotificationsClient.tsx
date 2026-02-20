@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { markAsRead, markAllAsRead } from "@/actions/notification";
 import { ROUTES } from "@/lib/constants/routes";
 
@@ -55,19 +56,22 @@ function NotificationIcon({ type }: { type: string }) {
   );
 }
 
-function formatTime(dateStr: string) {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHour = Math.floor(diffMs / 3600000);
-  const diffDay = Math.floor(diffMs / 86400000);
+function useFormatTime() {
+  const t = useTranslations("notifications");
+  return (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHour = Math.floor(diffMs / 3600000);
+    const diffDay = Math.floor(diffMs / 86400000);
 
-  if (diffMin < 1) return "방금 전";
-  if (diffMin < 60) return `${diffMin}분 전`;
-  if (diffHour < 24) return `${diffHour}시간 전`;
-  if (diffDay < 7) return `${diffDay}일 전`;
-  return date.toLocaleDateString("ko-KR", { month: "short", day: "numeric" });
+    if (diffMin < 1) return t("just_now");
+    if (diffMin < 60) return t("minutes_ago", { minutes: diffMin });
+    if (diffHour < 24) return t("hours_ago", { hours: diffHour });
+    if (diffDay < 7) return t("days_ago", { days: diffDay });
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  };
 }
 
 function getNotificationLink(notification: Notification): string {
@@ -85,6 +89,8 @@ export default function NotificationsClient({
 }: {
   initialNotifications: Notification[];
 }) {
+  const t = useTranslations("notifications");
+  const formatTime = useFormatTime();
   const [notifications, setNotifications] = useState(initialNotifications);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
@@ -115,14 +121,14 @@ export default function NotificationsClient({
   return (
     <div className="px-4 pb-24 pt-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-stranger-light">알림</h1>
+        <h1 className="text-2xl font-bold text-stranger-light">{t("title")}</h1>
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllAsRead}
             disabled={isPending}
             className="text-xs text-stranger-accent disabled:opacity-50"
           >
-            {isPending ? "처리 중..." : "모두 읽음 처리"}
+            {isPending ? t("processing") : t("mark_all_read")}
           </button>
         )}
       </div>
@@ -148,10 +154,10 @@ export default function NotificationsClient({
             </svg>
           </div>
           <h3 className="text-lg font-bold text-stranger-light">
-            알림이 없습니다
+            {t("empty_title")}
           </h3>
           <p className="mt-1 text-sm text-gray-400">
-            매칭이나 미션 관련 소식이 여기에 표시됩니다
+            {t("empty_desc")}
           </p>
         </div>
       ) : (

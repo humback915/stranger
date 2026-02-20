@@ -1,15 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { submitAnswer } from "@/actions/question";
-
-const CATEGORY_LABELS: Record<string, string> = {
-  values: "가치관",
-  lifestyle: "라이프스타일",
-  romance: "연애관",
-  personality: "성격",
-  taste: "취향",
-};
 
 interface QuestionCardProps {
   question: {
@@ -32,6 +25,14 @@ export default function QuestionCard({
   total,
   onAnswered,
 }: QuestionCardProps) {
+  const t = useTranslations("questions");
+  const categoryLabels: Record<string, string> = {
+    values: t("category_values"),
+    lifestyle: t("category_lifestyle"),
+    romance: t("category_romance"),
+    personality: t("category_personality"),
+    taste: t("category_taste"),
+  };
   const [selected, setSelected] = useState<"a" | "b" | null>(
     existingAnswer ?? null
   );
@@ -60,7 +61,7 @@ export default function QuestionCard({
       {/* 카테고리 + 진행도 */}
       <div className="mb-3 flex items-center justify-between">
         <span className="rounded-md bg-stranger-accent/20 px-2 py-0.5 text-xs text-stranger-accent">
-          {CATEGORY_LABELS[question.category] ?? question.category}
+          {categoryLabels[question.category] ?? question.category}
         </span>
         <span className="text-xs text-gray-500">
           {index + 1} / {total}

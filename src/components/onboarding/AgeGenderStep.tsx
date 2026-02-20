@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { ROUTES } from "@/lib/constants/routes";
 import Button from "@/components/ui/Button";
 import PageTransition from "@/components/motion/PageTransition";
 
 export default function AgeGenderStep() {
+  const t = useTranslations("onboarding");
   const router = useRouter();
   const [nickname, setNickname] = useState("");
   const [birthYear, setBirthYear] = useState("");
@@ -25,7 +27,7 @@ export default function AgeGenderStep() {
 
   const handleNext = () => {
     if (nickname.length < 2 || nickname.length > 10) {
-      setError("닉네임은 2~10자로 입력해주세요");
+      setError(t("errors.nickname_length"));
       return;
     }
 
@@ -33,11 +35,11 @@ export default function AgeGenderStep() {
     const currentYear = new Date().getFullYear();
 
     if (!year || year < 1924 || year > currentYear - 19) {
-      setError("만 19세 이상만 가입할 수 있습니다");
+      setError(t("errors.age_min"));
       return;
     }
     if (!gender) {
-      setError("성별을 선택해주세요");
+      setError(t("errors.gender_required"));
       return;
     }
 
@@ -52,15 +54,15 @@ export default function AgeGenderStep() {
   return (
     <PageTransition>
       <h2 className="mb-8 text-2xl font-bold text-stranger-light">
-        기본 정보를 알려주세요
+        {t("basic_info")}
       </h2>
 
       <div className="flex flex-col gap-6">
         <div>
-          <label className="mb-2 block text-sm text-gray-400">닉네임</label>
+          <label className="mb-2 block text-sm text-gray-400">{t("nickname")}</label>
           <input
             type="text"
-            placeholder="2~10자 닉네임"
+            placeholder={t("nickname_placeholder")}
             value={nickname}
             onChange={(e) => {
               setNickname(e.target.value);
@@ -72,11 +74,11 @@ export default function AgeGenderStep() {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-gray-400">출생연도</label>
+          <label className="mb-2 block text-sm text-gray-400">{t("birth_year")}</label>
           <input
             type="number"
             inputMode="numeric"
-            placeholder="예: 1995"
+            placeholder={t("birth_year_placeholder")}
             value={birthYear}
             onChange={(e) => {
               setBirthYear(e.target.value);
@@ -87,12 +89,12 @@ export default function AgeGenderStep() {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-gray-400">성별</label>
+          <label className="mb-2 block text-sm text-gray-400">{t("gender")}</label>
           <div className="flex gap-3">
             {(
               [
-                { value: "male", label: "남성" },
-                { value: "female", label: "여성" },
+                { value: "male", label: t("gender_male") },
+                { value: "female", label: t("gender_female") },
               ] as const
             ).map((option) => (
               <button
@@ -122,7 +124,7 @@ export default function AgeGenderStep() {
           className="mt-4 w-full"
           size="lg"
         >
-          다음
+          {t("complete_start")}
         </Button>
       </div>
     </PageTransition>

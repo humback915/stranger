@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import ChatInput from "./ChatInput";
 import ReportModal from "@/components/safety/ReportModal";
@@ -27,6 +28,7 @@ export default function ChatWindow({
   partnerId,
   initialMessages,
 }: ChatWindowProps) {
+  const t = useTranslations("chat");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [reportOpen, setReportOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -91,7 +93,7 @@ export default function ChatWindow({
           onClick={() => setReportOpen(true)}
           className="text-xs text-gray-600 hover:text-red-400"
         >
-          신고하기
+          {t("report")}
         </button>
       </div>
 
@@ -106,7 +108,7 @@ export default function ChatWindow({
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {messages.length === 0 && (
           <p className="py-8 text-center text-sm text-gray-500">
-            첫 메시지를 보내보세요!
+            {t("no_messages")}
           </p>
         )}
         {messages.map((msg) => {

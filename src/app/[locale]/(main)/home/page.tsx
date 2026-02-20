@@ -1,14 +1,11 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { getMyMatches } from "@/actions/matching";
 import { ROUTES } from "@/lib/constants/routes";
 
-const GENDER_LABELS: Record<string, string> = {
-  male: "남성",
-  female: "여성",
-  any: "무관",
-};
-
 export default async function HomePage() {
+  const t = await getTranslations("home");
+  const gt = await getTranslations("gender");
   const result = await getMyMatches();
   const matches = result.matches ?? [];
 
@@ -22,39 +19,39 @@ export default async function HomePage() {
   return (
     <div className="px-6 py-8">
       <p className="text-gray-400">
-        가치관 질문에 답하고 나와 맞는 사람을 만나보세요
+        {t("subtitle")}
       </p>
 
       <div className="mt-8 flex flex-col gap-4">
         <div className="rounded-2xl bg-stranger-mid p-6">
           <h3 className="font-medium text-stranger-light">
-            오늘의 질문에 답해보세요
+            {t("questions_card_title")}
           </h3>
           <p className="mt-1 text-sm text-gray-400">
-            답변이 많을수록 더 정확한 매칭이 가능해요
+            {t("questions_card_desc")}
           </p>
           <Link
             href={ROUTES.QUESTIONS}
             className="mt-4 inline-block rounded-xl bg-stranger-accent px-4 py-2 text-sm font-medium text-white"
           >
-            질문 답변하기
+            {t("questions_card_btn")}
           </Link>
         </div>
 
         <div className="rounded-2xl bg-stranger-mid p-6">
           <div className="flex items-center justify-between">
-            <h3 className="font-medium text-stranger-light">매칭 현황</h3>
+            <h3 className="font-medium text-stranger-light">{t("matches_title")}</h3>
             <Link
               href={ROUTES.MATCHES}
               className="text-xs text-stranger-accent"
             >
-              전체보기
+              {t("matches_view_all")}
             </Link>
           </div>
 
           {matches.length === 0 ? (
             <p className="mt-2 text-sm text-gray-400">
-              아직 진행 중인 매칭이 없습니다
+              {t("no_matches")}
             </p>
           ) : (
             <div className="mt-3 space-y-3">
@@ -79,7 +76,7 @@ export default async function HomePage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-stranger-light">
-                            {p ? `${GENDER_LABELS[p.gender]} · ${age}세` : "정보 없음"}
+                            {p ? `${gt(p.gender as "male" | "female" | "any")} · ${age}` : t("no_info")}
                           </span>
                           {p?.mbti && (
                             <span className="rounded bg-stranger-accent/20 px-1.5 py-0.5 text-[10px] text-stranger-accent">
@@ -87,7 +84,7 @@ export default async function HomePage() {
                             </span>
                           )}
                           <span className="rounded-md bg-green-500/20 px-1.5 py-0.5 text-[10px] text-green-400">
-                            매칭 성사
+                            {t("match_accepted")}
                           </span>
                         </div>
                         <p className="text-xs text-gray-400">
@@ -110,11 +107,11 @@ export default async function HomePage() {
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1.5 pl-[52px]">
                       <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-stranger-accent">
-                        호환도 {Math.round(match.compatibility_score * 100)}%
+                        {t("compatibility", { score: Math.round(match.compatibility_score * 100) })}
                       </span>
                       {match.missionId && (
                         <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-blue-400">
-                          미션 진행 중
+                          {t("mission_in_progress")}
                         </span>
                       )}
                       {p?.hobbies?.slice(0, 3).map((h: string) => (
@@ -149,7 +146,7 @@ export default async function HomePage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-stranger-light">
-                            {p ? `${GENDER_LABELS[p.gender]} · ${age}세` : "정보 없음"}
+                            {p ? `${gt(p.gender as "male" | "female" | "any")} · ${age}` : t("no_info")}
                           </span>
                           {p?.mbti && (
                             <span className="rounded bg-stranger-accent/20 px-1.5 py-0.5 text-[10px] text-stranger-accent">
@@ -157,7 +154,7 @@ export default async function HomePage() {
                             </span>
                           )}
                           <span className="rounded-md bg-yellow-500/20 px-1.5 py-0.5 text-[10px] text-yellow-400">
-                            {myAccepted === true ? "상대 응답 대기" : "응답 대기"}
+                            {myAccepted === true ? t("waiting_partner") : t("waiting")}
                           </span>
                         </div>
                         <p className="text-xs text-gray-400">
@@ -180,16 +177,16 @@ export default async function HomePage() {
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1.5 pl-[52px]">
                       <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-stranger-accent">
-                        호환도 {Math.round(match.compatibility_score * 100)}%
+                        {t("compatibility", { score: Math.round(match.compatibility_score * 100) })}
                       </span>
                       {p?.preferred_gender && (
                         <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-gray-400">
-                          선호: {GENDER_LABELS[p.preferred_gender]}
+                          {gt(p.preferred_gender as "male" | "female" | "any")}
                         </span>
                       )}
                       {p?.preferred_age_min != null && (
                         <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-gray-400">
-                          {p.preferred_age_min}~{p.preferred_age_max}세
+                          {p.preferred_age_min}~{p.preferred_age_max}
                         </span>
                       )}
                     </div>

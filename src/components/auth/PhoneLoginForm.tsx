@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { phoneSchema, type PhoneFormValues } from "@/lib/validations/auth";
@@ -12,6 +13,7 @@ import Button from "@/components/ui/Button";
 
 export default function PhoneLoginForm() {
   const router = useRouter();
+  const t = useTranslations("auth");
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +47,7 @@ export default function PhoneLoginForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       <div>
         <label className="mb-2 block text-sm text-gray-400">
-          휴대폰 번호
+          {t("phone_label")}
         </label>
         <Controller
           control={control}
@@ -65,7 +67,7 @@ export default function PhoneLoginForm() {
       )}
 
       <Button type="submit" loading={loading} className="w-full" size="lg">
-        인증번호 받기
+        {t("send_otp")}
       </Button>
     </form>
   );

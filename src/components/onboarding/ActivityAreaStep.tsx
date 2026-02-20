@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { REGIONS, type Area } from "@/lib/constants/areas";
 import { ROUTES } from "@/lib/constants/routes";
 import Button from "@/components/ui/Button";

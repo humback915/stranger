@@ -1,13 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { answerCustomQuestion } from "@/actions/custom-question";
-
-const GENDER_LABELS: Record<string, string> = {
-  male: "남성",
-  female: "여성",
-  any: "무관",
-};
 
 interface AuthorProfile {
   id: string;
@@ -41,6 +36,13 @@ export default function CustomQuestionCard({
   existingAnswer,
   onAnswered,
 }: CustomQuestionCardProps) {
+  const t = useTranslations("questions");
+  const tGender = useTranslations("gender");
+  const genderLabels: Record<string, string> = {
+    male: tGender("male"),
+    female: tGender("female"),
+    any: tGender("any"),
+  };
   const [selected, setSelected] = useState<"a" | "b" | null>(
     existingAnswer ?? null
   );
@@ -72,7 +74,7 @@ export default function CustomQuestionCard({
     <div className="rounded-2xl bg-stranger-mid p-5">
       <div className="mb-1 flex items-center gap-2">
         <span className="rounded-md bg-purple-500/20 px-2 py-0.5 text-xs text-purple-400">
-          사용자 질문
+          {t("user_question_badge")}
         </span>
       </div>
 
@@ -86,7 +88,7 @@ export default function CustomQuestionCard({
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-sm font-medium text-stranger-light">
-                  {GENDER_LABELS[author.gender]} · {authorAge}세
+                  {genderLabels[author.gender] ?? author.gender} · {t("author_age", { age: authorAge! })}
                 </span>
                 {author.mbti && (
                   <span className="rounded bg-stranger-accent/20 px-1.5 py-0.5 text-[10px] text-stranger-accent">
@@ -113,13 +115,13 @@ export default function CustomQuestionCard({
           ) : null}
           <div className="mt-2 flex flex-wrap gap-1.5">
             <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-gray-400">
-              선호: {GENDER_LABELS[author.preferred_gender]}
+              {t("author_preferred_gender", { gender: genderLabels[author.preferred_gender] ?? author.preferred_gender })}
             </span>
             <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-gray-400">
-              {author.preferred_age_min}~{author.preferred_age_max}세
+              {t("author_age_range", { min: author.preferred_age_min, max: author.preferred_age_max })}
             </span>
             <span className="rounded-md bg-stranger-mid px-2 py-0.5 text-[10px] text-gray-400">
-              {author.preferred_distance_km}km 이내
+              {t("author_distance", { km: author.preferred_distance_km })}
             </span>
           </div>
         </div>

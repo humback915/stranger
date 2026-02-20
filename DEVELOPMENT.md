@@ -900,12 +900,70 @@ ORDER BY m.meeting_time;
 - [x] 매칭 목록 UI
 - [x] 설정 페이지 (프로필 수정, 계정 정지, 탈퇴)
 - [x] Google Maps 장소 표시 — `@vis.gl/react-google-maps`, API 키 없으면 링크 폴백
-- [x] 관리자 대시보드 (신고 관리, 노쇼 관리) — `(admin)` 라우트 그룹, service_role RLS 우회
+- [x] 관리자 대시보드 (신고 관리, 노쇼 관리, 사용자 관리) — `(admin)` 라우트 그룹, service_role RLS 우회
 - [x] 푸시 알림 (출발 확인 리마인더) — FCM, 멀티 디바이스, 만료 토큰 자동 정리, 크론 리마인더
+- [x] 채팅 기능 — Supabase Realtime 실시간 수신, 읽음 처리, 미읽음 배지, 마지막 메시지 미리보기 (`matches/[id]/chat`)
+- [x] 매칭 만료 자동 처리 — Vercel Cron (`/api/cron/expire-matches`), 매일 02:00 UTC 실행, 양쪽 사용자 알림 전송
+- [x] 노쇼 자동 처리 크론 — `/api/cron/no-show`, 10분 간격, 3회 누적 시 계정 정지
+- [x] 알림 시스템 — notifications 테이블, 알림 페이지 UI, 미읽음 배지(NotificationBell), 전체 읽음 처리
+- [x] 프로필 사진 수정 UI — 최대 5장, Supabase Storage 업로드/삭제 (PhotoEditor 컴포넌트)
+- [x] 신고 UI (ReportModal) — 채팅 내 상대방 신고, 5가지 유형, 위치 자동 수집
+- [x] Vercel Cron 스케줄 설정 — `vercel.json` (expire-matches, no-show, departure-reminder)
+- [x] 다국어 지원 (ko / en / ja) — next-intl, `[locale]` 라우팅, 전체 UI 컴포넌트 번역 완료
+  - `messages/ko.json`, `messages/en.json`, `messages/ja.json` (15개 섹션 + place_categories, prop_categories)
+  - SafetyButton, QuestionCard, CustomQuestion*, 온보딩 7개 컴포넌트, MissionCard 등 하드코딩 한국어 전환 완료
+  - LanguageSwitcher 컴포넌트 및 설정 페이지 언어 선택 UI
 
 ### 아직 미구현 (TODO)
-- [ ] 프로덕션 배포 (Vercel + Cloud Supabase)
+
+#### 우선순위 높음
+- [ ] 프로덕션 배포 (Vercel + Cloud Supabase 실제 배포)
+  - Vercel 환경 변수 설정 및 도메인 연결
+  - Supabase Cloud DB 마이그레이션
+  - Vercel Cron 동작 확인 (expire-matches, no-show, departure-reminder)
+  - 푸시 알림 Web Push VAPID 프로덕션 확인
+  - 전체 기능 QA 테스트
 - [ ] SMS Provider 연동 (Twilio 등 — 현재 Supabase 테스트 모드)
 - [ ] 이미지 최적화 (`<img>` → `next/image`)
-- [ ] 매칭 만료 자동 처리 (크론 또는 DB 트리거)
-- [ ] 채팅 기능 (매칭 성사 후 간단한 인앱 메시지)
+- [ ] 질문 선택지 DB 다국어 구조 — `questions.option_a/b` 가 DB에 한국어로 저장되어 있어 번역 불가. 별도 translations 테이블 또는 컬럼 추가(`option_a_en`, `option_a_ja`) 필요
+
+#### 후순위 — iOS/Android 앱 배포 (프로덕션 배포 완료 후 진행)
+
+> **전제**: Capacitor 원격 URL 방식 사용 권장 — `capacitor.config.ts`의 `server.url`에 Vercel 배포 URL 지정.
+> SSR, Server Actions, Cron API를 그대로 유지하며 네이티브 앱 래핑 가능.
+
+- [ ] **Capacitor 설정**
+  - `@capacitor/core`, `@capacitor/cli`, `@capacitor/ios`, `@capacitor/android` 설치
+  - `npx cap init` (App ID: `com.hellostrangerapp.app`)
+  - `capacitor.config.ts`에 `server.url: "https://프로덕션도메인"` 설정
+  - `npx cap add ios && npx cap add android`
+
+- [ ] **iOS App Store 배포**
+  - Apple Developer Program 가입 ($99/년)
+  - Xcode에서 Bundle Identifier, 버전, 아이콘, 스플래시 화면 설정
+  - 권한 추가: `NSLocationWhenInUseUsageDescription` (매칭 거리), `NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription` (프로필 사진)
+  - iOS 17+ Privacy Manifest(`PrivacyInfo.xcprivacy`) 작성
+  - App Store Connect에서 앱 등록 → TestFlight 내부 테스트 → 심사 제출
+  - 주의: 데이팅 앱 심사 가이드라인 1.1.4 확인 필요 (SMS OTP 신원 인증으로 충족 가능)
+
+- [ ] **Android Play Store 배포**
+  - Google Play Console 계정 생성 ($25 일회성)
+  - Android Studio에서 `applicationId`, 버전, 아이콘(Adaptive Icon), 스플래시 화면 설정
+  - 권한 추가: `ACCESS_FINE_LOCATION`, `CAMERA`, `READ_MEDIA_IMAGES`, `POST_NOTIFICATIONS`
+  - `targetSdk 35` 설정 (Play Store 정책)
+  - Keystore 생성 및 안전 보관 (분실 시 업데이트 불가 — Google Play App Signing 사용 권장)
+  - `./gradlew bundleRelease` → AAB 파일 생성 → Play Console 업로드
+  - Internal Testing → Closed Testing → Production 순서로 출시
+
+- [ ] **네이티브 기능 플러그인 연동**
+  - `@capacitor/push-notifications`: FCM(Android) / APNs(iOS) 푸시 — 기존 Web Push VAPID 병행 운영
+    - Firebase 프로젝트 생성 (`google-services.json` 추가)
+    - Apple Developer에서 APNs Key 발급
+  - `@capacitor/camera`: 프로필 사진 업로드 네이티브 UI (PhotoEditor, PhotosStep 수정)
+  - `@capacitor/geolocation`: 위치 권한 처리 안정화
+  - 플러그인 추가 후 `npx cap sync` 실행
+
+- [ ] **CI/CD 파이프라인 (선택)**
+  - Fastlane으로 iOS/Android 빌드 자동화
+  - GitHub Actions macOS runner에서 TestFlight 자동 업로드
+  - 참고: 원격 URL 방식 사용 시 Vercel 배포만으로 앱에도 자동 반영 → OTA 별도 설정 불필요

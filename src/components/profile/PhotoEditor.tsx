@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { uploadProfilePhoto, deleteProfilePhoto } from "@/actions/photo";
 import { updateProfile } from "@/actions/profile";
 
@@ -18,6 +19,7 @@ export default function PhotoEditor({
   onSaved,
   onCancel,
 }: PhotoEditorProps) {
+  const t = useTranslations("profile");
   const [photos, setPhotos] = useState<string[]>(initialPhotos);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -115,7 +117,7 @@ export default function PhotoEditor({
             </button>
             {index === 0 && (
               <span className="absolute bottom-1 left-1 rounded bg-stranger-accent/90 px-1.5 py-0.5 text-[10px] text-white">
-                대표
+                {t("photo_representative")}
               </span>
             )}
           </div>
@@ -169,14 +171,14 @@ export default function PhotoEditor({
           onClick={onCancel}
           className="flex-1 rounded-xl border border-gray-600 py-2.5 text-sm text-gray-400"
         >
-          취소
+          {t("photo_cancel")}
         </button>
         <button
           onClick={handleSave}
           disabled={isPending || uploading || photos.length < MIN_PHOTOS}
           className="flex-1 rounded-xl bg-stranger-accent py-2.5 text-sm font-medium text-white disabled:opacity-50"
         >
-          {isPending ? "저장 중..." : "저장하기"}
+          {isPending ? t("photo_saving") : t("photo_save")}
         </button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { createCustomQuestion } from "@/actions/custom-question";
 
 interface CustomQuestionFormProps {
@@ -10,6 +11,8 @@ interface CustomQuestionFormProps {
 export default function CustomQuestionForm({
   onCreated,
 }: CustomQuestionFormProps) {
+  const t = useTranslations("questions");
+  const tCommon = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [questionText, setQuestionText] = useState("");
   const [optionA, setOptionA] = useState("");
@@ -29,11 +32,11 @@ export default function CustomQuestionForm({
 
   const handleSubmit = () => {
     if (!questionText.trim() || !optionA.trim() || !optionB.trim()) {
-      setError("모든 항목을 입력해주세요");
+      setError(t("error_fill_all"));
       return;
     }
     if (!preferred) {
-      setError("선호하는 답변을 선택해주세요");
+      setError(t("error_select_preferred"));
       return;
     }
 
@@ -60,7 +63,7 @@ export default function CustomQuestionForm({
         onClick={() => setOpen(true)}
         className="w-full rounded-xl border-2 border-dashed border-gray-600 px-4 py-4 text-sm text-gray-400 transition-colors hover:border-stranger-accent hover:text-stranger-accent"
       >
-        + 나만의 질문 만들기
+        + {t("create_title")}
       </button>
     );
   }
@@ -68,41 +71,41 @@ export default function CustomQuestionForm({
   return (
     <div className="rounded-2xl bg-stranger-mid p-5">
       <h3 className="mb-4 text-sm font-bold text-stranger-light">
-        나만의 질문 만들기
+        {t("create_title")}
       </h3>
 
       <div className="space-y-3">
         <div>
-          <label className="mb-1 block text-xs text-gray-400">질문</label>
+          <label className="mb-1 block text-xs text-gray-400">{t("create_question_label")}</label>
           <input
             type="text"
             value={questionText}
             onChange={(e) => setQuestionText(e.target.value)}
-            placeholder="상대에게 물어보고 싶은 질문"
+            placeholder={t("create_question_placeholder")}
             maxLength={200}
             className="w-full rounded-lg border border-gray-600 bg-stranger-dark px-3 py-2.5 text-sm text-stranger-light placeholder:text-gray-500 focus:border-stranger-accent focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-gray-400">선택지 A</label>
+          <label className="mb-1 block text-xs text-gray-400">{t("create_option_a")}</label>
           <input
             type="text"
             value={optionA}
             onChange={(e) => setOptionA(e.target.value)}
-            placeholder="첫 번째 선택지"
+            placeholder={t("create_option_a_placeholder")}
             maxLength={100}
             className="w-full rounded-lg border border-gray-600 bg-stranger-dark px-3 py-2.5 text-sm text-stranger-light placeholder:text-gray-500 focus:border-stranger-accent focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-gray-400">선택지 B</label>
+          <label className="mb-1 block text-xs text-gray-400">{t("create_option_b")}</label>
           <input
             type="text"
             value={optionB}
             onChange={(e) => setOptionB(e.target.value)}
-            placeholder="두 번째 선택지"
+            placeholder={t("create_option_b_placeholder")}
             maxLength={100}
             className="w-full rounded-lg border border-gray-600 bg-stranger-dark px-3 py-2.5 text-sm text-stranger-light placeholder:text-gray-500 focus:border-stranger-accent focus:outline-none"
           />
@@ -110,7 +113,7 @@ export default function CustomQuestionForm({
 
         <div>
           <label className="mb-1 block text-xs text-gray-400">
-            내가 선호하는 답변 (상대에게는 보이지 않음)
+            {t("create_preferred_label")}
           </label>
           <div className="flex gap-2">
             <button
@@ -122,7 +125,7 @@ export default function CustomQuestionForm({
                   : "border-gray-600 text-gray-400"
               }`}
             >
-              A 선호
+              {t("prefer_a")}
             </button>
             <button
               type="button"
@@ -133,7 +136,7 @@ export default function CustomQuestionForm({
                   : "border-gray-600 text-gray-400"
               }`}
             >
-              B 선호
+              {t("prefer_b")}
             </button>
           </div>
         </div>
@@ -146,14 +149,14 @@ export default function CustomQuestionForm({
           onClick={reset}
           className="flex-1 rounded-lg border border-gray-600 py-2.5 text-sm text-gray-400"
         >
-          취소
+          {tCommon("cancel")}
         </button>
         <button
           onClick={handleSubmit}
           disabled={isPending}
           className="flex-1 rounded-lg bg-stranger-accent py-2.5 text-sm font-medium text-white disabled:opacity-50"
         >
-          {isPending ? "저장 중..." : "질문 만들기"}
+          {isPending ? tCommon("saving") : t("create_submit")}
         </button>
       </div>
     </div>

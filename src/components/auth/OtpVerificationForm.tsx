@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { verifyOtp, sendOtp } from "@/actions/auth";
 import { useCountdown } from "@/hooks/useCountdown";
 import { ROUTES } from "@/lib/constants/routes";
@@ -10,6 +11,7 @@ import Button from "@/components/ui/Button";
 
 export default function OtpVerificationForm() {
   const router = useRouter();
+  const t = useTranslations("auth");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [serverError, setServerError] = useState("");
@@ -67,7 +69,7 @@ export default function OtpVerificationForm() {
     <div className="flex flex-col gap-6">
       <div className="text-center">
         <p className="text-sm text-gray-400">
-          {phone}로 전송된 인증번호를 입력해주세요
+          {t("otp_sent", { phone })}
         </p>
         {isRunning && (
           <p className="mt-1 text-sm text-stranger-accent">{formatted}</p>
@@ -87,7 +89,7 @@ export default function OtpVerificationForm() {
         className="w-full"
         size="lg"
       >
-        확인
+        {t("verify_otp")}
       </Button>
 
       <button
@@ -96,7 +98,7 @@ export default function OtpVerificationForm() {
         disabled={isRunning}
         className="text-sm text-gray-400 hover:text-stranger-light disabled:opacity-50 transition-colors"
       >
-        {isRunning ? `재전송 (${formatted})` : "인증번호 재전송"}
+        {isRunning ? t("resend_countdown", { countdown: formatted }) : t("resend_otp")}
       </button>
     </div>
   );

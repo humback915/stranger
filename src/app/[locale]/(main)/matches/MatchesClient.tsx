@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { runMatching } from "@/actions/matching";
 import MatchCard from "@/components/matches/MatchCard";
 
@@ -45,6 +46,7 @@ interface MatchesClientProps {
 }
 
 export default function MatchesClient({ initialMatches }: MatchesClientProps) {
+  const t = useTranslations("matches");
   const [matches, setMatches] = useState(initialMatches);
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
@@ -57,7 +59,7 @@ export default function MatchesClient({ initialMatches }: MatchesClientProps) {
         setMessage(result.error);
       } else {
         setMessage(
-          `매칭 성공! 호환도 ${result.compatibility}%, 거리 ${result.distance}km`
+          t("match_success", { compatibility: result.compatibility ?? 0, distance: result.distance ?? 0 })
         );
         // 페이지 새로고침으로 새 매칭 표시
         window.location.reload();
@@ -95,9 +97,9 @@ export default function MatchesClient({ initialMatches }: MatchesClientProps) {
 
   return (
     <div className="px-4 pb-24 pt-6">
-      <h1 className="text-2xl font-bold text-stranger-light">매칭</h1>
+      <h1 className="text-2xl font-bold text-stranger-light">{t("title")}</h1>
       <p className="mt-1 text-sm text-gray-400">
-        가치관이 맞는 상대를 찾아보세요
+        {t("subtitle")}
       </p>
 
       {/* 매칭 찾기 버튼 */}
@@ -109,10 +111,10 @@ export default function MatchesClient({ initialMatches }: MatchesClientProps) {
         {isPending ? (
           <span className="flex items-center justify-center gap-2">
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            매칭 중...
+            {t("finding")}
           </span>
         ) : (
-          "새로운 매칭 찾기"
+          t("find_match")
         )}
       </button>
 
@@ -132,7 +134,7 @@ export default function MatchesClient({ initialMatches }: MatchesClientProps) {
       {pendingMatches.length > 0 && (
         <div className="mt-6">
           <h2 className="mb-3 text-sm font-medium text-gray-400">
-            대기 중 ({pendingMatches.length})
+            {t("pending_section", { count: pendingMatches.length })}
           </h2>
           <div className="flex flex-col gap-3">
             {pendingMatches.map((match) => (
@@ -150,7 +152,7 @@ export default function MatchesClient({ initialMatches }: MatchesClientProps) {
       {activeMatches.length > 0 && (
         <div className="mt-6">
           <h2 className="mb-3 text-sm font-medium text-gray-400">
-            진행 중 ({activeMatches.length})
+            {t("active_section", { count: activeMatches.length })}
           </h2>
           <div className="flex flex-col gap-3">
             {activeMatches.map((match) => (
@@ -164,7 +166,7 @@ export default function MatchesClient({ initialMatches }: MatchesClientProps) {
       {pastMatches.length > 0 && (
         <div className="mt-6">
           <h2 className="mb-3 text-sm font-medium text-gray-400">
-            지난 매칭 ({pastMatches.length})
+            {t("past_section", { count: pastMatches.length })}
           </h2>
           <div className="flex flex-col gap-3">
             {pastMatches.map((match) => (
@@ -193,10 +195,10 @@ export default function MatchesClient({ initialMatches }: MatchesClientProps) {
             </svg>
           </div>
           <h3 className="text-lg font-bold text-stranger-light">
-            아직 매칭이 없어요
+            {t("no_matches_title")}
           </h3>
           <p className="mt-1 text-sm text-gray-400">
-            위 버튼을 눌러 나와 맞는 상대를 찾아보세요
+            {t("no_matches_desc")}
           </p>
         </div>
       )}

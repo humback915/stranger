@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { uploadProfilePhoto, deleteProfilePhoto } from "@/actions/photo";
 import { ROUTES } from "@/lib/constants/routes";
 import Button from "@/components/ui/Button";
@@ -12,6 +13,8 @@ const MIN_PHOTOS = 2;
 
 export default function PhotosStep() {
   const router = useRouter();
+  const t = useTranslations("onboarding");
+  const tCommon = useTranslations("common");
   const [photos, setPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -36,11 +39,11 @@ export default function PhotosStep() {
 
     for (const file of filesToUpload) {
       if (file.size > 5 * 1024 * 1024) {
-        setError("파일 크기는 5MB 이하여야 합니다");
+        setError(t("photos_size_error"));
         continue;
       }
       if (!file.type.startsWith("image/")) {
-        setError("이미지 파일만 업로드할 수 있습니다");
+        setError(t("photos_type_error"));
         continue;
       }
 
@@ -94,7 +97,7 @@ export default function PhotosStep() {
 
   const handleNext = () => {
     if (photos.length < MIN_PHOTOS) {
-      setError(`최소 ${MIN_PHOTOS}장의 사진을 등록해주세요`);
+      setError(t("photos_min_error"));
       return;
     }
 
@@ -109,10 +112,10 @@ export default function PhotosStep() {
   return (
     <PageTransition>
       <h2 className="mb-2 text-2xl font-bold text-stranger-light">
-        프로필 사진을 등록해주세요
+        {t("photos_title")}
       </h2>
       <p className="mb-8 text-sm text-gray-400">
-        최소 {MIN_PHOTOS}장, 최대 {MAX_PHOTOS}장까지 등록할 수 있어요
+        {t("photos_count_desc", { min: MIN_PHOTOS, max: MAX_PHOTOS })}
       </p>
 
       <div className="grid grid-cols-3 gap-3">
@@ -120,7 +123,7 @@ export default function PhotosStep() {
           <div key={url} className="relative aspect-square">
             <img
               src={url}
-              alt={`프로필 사진 ${index + 1}`}
+              alt={t("photos_upload")}
               className="h-full w-full rounded-xl object-cover"
             />
             <button
@@ -134,7 +137,7 @@ export default function PhotosStep() {
             </button>
             {index === 0 && (
               <span className="absolute bottom-1 left-1 rounded bg-stranger-accent/90 px-1.5 py-0.5 text-[10px] text-white">
-                대표
+                {t("photos_representative")}
               </span>
             )}
           </div>
@@ -178,7 +181,7 @@ export default function PhotosStep() {
       </div>
 
       <p className="mt-4 text-xs text-gray-500">
-        매칭 시 상대방에게 사진이 공개됩니다. 본인 사진을 올려주세요.
+        {t("photos_privacy_notice")}
       </p>
 
       {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
@@ -189,7 +192,7 @@ export default function PhotosStep() {
         className="mt-6 w-full"
         size="lg"
       >
-        다음
+        {tCommon("next")}
       </Button>
     </PageTransition>
   );

@@ -1,15 +1,10 @@
 "use client";
 
 import { useState, useTransition, useCallback } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { respondToMatch } from "@/actions/matching";
 import { ROUTES } from "@/lib/constants/routes";
-
-const GENDER_LABELS: Record<string, string> = {
-  male: "남성",
-  female: "여성",
-  any: "무관",
-};
 
 interface Partner {
   id: string;
@@ -55,6 +50,8 @@ interface MatchCardProps {
 }
 
 export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
+  const t = useTranslations("matches");
+  const gt = useTranslations("gender");
   const [status, setStatus] = useState(match.status);
   const [myAccepted, setMyAccepted] = useState<boolean | null>(
     match.role === "user_a" ? match.user_a_accepted : match.user_b_accepted
@@ -95,13 +92,12 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
 
   // 표시할 상태 결정
   const getDisplayStatus = () => {
-    if (status === "rejected") return { label: "거절됨", color: "bg-red-500/20 text-red-400" };
-    if (status === "accepted") return { label: "매칭 성사!", color: "bg-green-500/20 text-green-400" };
-    if (status === "completed") return { label: "완료", color: "bg-blue-500/20 text-blue-400" };
-    if (status === "expired") return { label: "만료됨", color: "bg-gray-500/20 text-gray-400" };
-    // pending
-    if (myAccepted === true) return { label: "상대 응답 대기", color: "bg-yellow-500/20 text-yellow-400" };
-    return { label: "응답 대기", color: "bg-yellow-500/20 text-yellow-400" };
+    if (status === "rejected") return { label: t("status_rejected"), color: "bg-red-500/20 text-red-400" };
+    if (status === "accepted") return { label: t("status_accepted"), color: "bg-green-500/20 text-green-400" };
+    if (status === "completed") return { label: t("status_completed"), color: "bg-blue-500/20 text-blue-400" };
+    if (status === "expired") return { label: t("status_expired"), color: "bg-gray-500/20 text-gray-400" };
+    if (myAccepted === true) return { label: t("status_waiting_partner"), color: "bg-yellow-500/20 text-yellow-400" };
+    return { label: t("status_waiting"), color: "bg-yellow-500/20 text-yellow-400" };
   };
 
   const { label: statusLabel, color: statusColor } = getDisplayStatus();
@@ -117,7 +113,7 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
           {statusLabel}
         </span>
         <span className="text-sm font-bold text-stranger-accent">
-          {Math.round(match.compatibility_score * 100)}% 호환
+          {t("compatibility_label", { score: Math.round(match.compatibility_score * 100) })}
         </span>
       </div>
 
@@ -138,7 +134,7 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-sm font-medium text-stranger-light">
-                  {GENDER_LABELS[partner.gender]} · {partnerAge}세
+                  {gt(partner.gender as "male" | "female" | "any")} · {partnerAge}
                 </p>
                 {partner.mbti && (
                   <span className="rounded bg-stranger-accent/20 px-1.5 py-0.5 text-[10px] text-stranger-accent">
@@ -180,16 +176,16 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
           {partner.preferred_gender && (
             <div className="flex flex-wrap gap-1.5 pl-[60px]">
               <span className="rounded-md bg-stranger-dark px-2 py-0.5 text-[10px] text-gray-400">
-                선호: {GENDER_LABELS[partner.preferred_gender]}
+                {t("preferred_label", { gender: gt(partner.preferred_gender as "male" | "female" | "any") })}
               </span>
               {partner.preferred_age_min != null && (
                 <span className="rounded-md bg-stranger-dark px-2 py-0.5 text-[10px] text-gray-400">
-                  {partner.preferred_age_min}~{partner.preferred_age_max}세
+                  {partner.preferred_age_min}~{partner.preferred_age_max}
                 </span>
               )}
               {partner.preferred_distance_km != null && (
                 <span className="rounded-md bg-stranger-dark px-2 py-0.5 text-[10px] text-gray-400">
-                  {partner.preferred_distance_km}km 이내
+                  {t("distance_within", { km: partner.preferred_distance_km })}
                 </span>
               )}
             </div>
@@ -197,20 +193,20 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
         </div>
       ) : (
         <p className="mb-3 text-sm text-gray-400">
-          상대 정보를 불러올 수 없습니다
+          {t("no_partner_info")}
         </p>
       )}
 
       {/* 점수 상세 */}
       <div className="mb-4 flex gap-2">
         <div className="flex-1 rounded-lg bg-stranger-dark px-3 py-2 text-center">
-          <p className="text-xs text-gray-400">유사도</p>
+          <p className="text-xs text-gray-400">{t("similarity_label")}</p>
           <p className="text-sm font-bold text-stranger-light">
             {Math.round(match.similarity_score * 100)}%
           </p>
         </div>
         <div className="flex-1 rounded-lg bg-stranger-dark px-3 py-2 text-center">
-          <p className="text-xs text-gray-400">거리</p>
+          <p className="text-xs text-gray-400">{t("distance_label")}</p>
           <p className="text-sm font-bold text-stranger-light">
             {match.distance_km != null ? `${match.distance_km}km` : "-"}
           </p>
@@ -220,7 +216,7 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
       {/* AI 호환성 분석 */}
       {match.ai_description && (
         <div className="mb-4 rounded-lg bg-stranger-dark px-4 py-3">
-          <p className="mb-1 text-xs text-stranger-accent">AI 호환성 분석</p>
+          <p className="mb-1 text-xs text-stranger-accent">{t("ai_analysis")}</p>
           <p className="text-sm leading-relaxed text-gray-300">
             {match.ai_description}
           </p>
@@ -232,7 +228,7 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
         <div className="mb-4 flex items-center gap-3">
           <div className="flex flex-1 items-center gap-2 rounded-lg bg-stranger-dark px-3 py-2">
             <div className="h-2.5 w-2.5 rounded-full bg-green-500" />
-            <span className="text-xs text-gray-300">내가 수락함</span>
+            <span className="text-xs text-gray-300">{t("my_accepted")}</span>
           </div>
           <div className="flex flex-1 items-center gap-2 rounded-lg bg-stranger-dark px-3 py-2">
             <div
@@ -246,10 +242,10 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
             />
             <span className="text-xs text-gray-300">
               {partnerAccepted === true
-                ? "상대 수락"
+                ? t("partner_accepted")
                 : partnerAccepted === false
-                  ? "상대 거절"
-                  : "상대 응답 대기"}
+                  ? t("partner_rejected")
+                  : t("partner_waiting")}
             </span>
           </div>
         </div>
@@ -263,14 +259,14 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
             disabled={isPending}
             className="flex-1 rounded-lg border border-gray-600 py-2.5 text-sm text-gray-400 transition-colors hover:border-red-500 hover:text-red-400 disabled:opacity-50"
           >
-            거절
+            {t("reject")}
           </button>
           <button
             onClick={() => handleRespond(true)}
             disabled={isPending}
             className="flex-1 rounded-lg bg-stranger-accent py-2.5 text-sm font-medium text-white disabled:opacity-50"
           >
-            {isPending ? "처리 중..." : "수락"}
+            {isPending ? t("processing") : t("accept")}
           </button>
         </div>
       )}
@@ -280,7 +276,7 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
         <div className="mb-3 rounded-lg bg-stranger-dark px-3 py-2.5">
           <p className="truncate text-xs text-gray-300">
             {lastMessage.is_mine && (
-              <span className="mr-1 text-gray-500">나:</span>
+              <span className="mr-1 text-gray-500">{t("me_label")}</span>
             )}
             {lastMessage.content}
           </p>
@@ -302,7 +298,7 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
             href={ROUTES.CHAT(match.id)}
             className="relative flex-1 rounded-lg border border-stranger-accent py-3 text-center text-sm font-medium text-stranger-accent"
           >
-            채팅하기
+            {t("chat")}
             {unreadCount > 0 && (
               <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                 {unreadCount > 9 ? "9+" : unreadCount}
@@ -314,7 +310,7 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
               href={ROUTES.MISSION_DETAIL(missionId)}
               className="flex-1 rounded-lg bg-stranger-accent py-3 text-center text-sm font-medium text-white"
             >
-              미션 확인하기
+              {t("view_mission")}
             </Link>
           )}
         </div>
@@ -343,7 +339,7 @@ function PhotoCarousel({ photos }: { photos: string[] }) {
       <div className="aspect-[4/3] w-full">
         <img
           src={photos[current]}
-          alt={`프로필 사진 ${current + 1}`}
+          alt={`photo ${current + 1}`}
           className="h-full w-full object-cover"
         />
       </div>
