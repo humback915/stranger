@@ -913,19 +913,34 @@ ORDER BY m.meeting_time;
   - `messages/ko.json`, `messages/en.json`, `messages/ja.json` (15개 섹션 + place_categories, prop_categories)
   - SafetyButton, QuestionCard, CustomQuestion*, 온보딩 7개 컴포넌트, MissionCard 등 하드코딩 한국어 전환 완료
   - LanguageSwitcher 컴포넌트 및 설정 페이지 언어 선택 UI
+- [x] 다국어 번역 버그 수정 및 질문 DB i18n 구조 추가 (2026-02-22)
+  - next-intl v4: 모든 서버 페이지에 `setRequestLocale(locale)` + `await params` 패턴 적용
+  - 미들웨어에 `x-next-intl-locale` 헤더 전파 추가
+  - DB 저장값(hobbies/personality/ideal_type/prop/action) 다국어 룩업 테이블 추가
+  - `00028` 마이그레이션: questions 테이블에 EN/JA 번역 컬럼 추가 (`question_text_en/ja`, `option_a/b_en/ja`)
+  - MatchCard/MissionCard 날짜 로케일 및 태그 번역 적용
+- [x] Vercel 프로덕션 배포 완료 (2026-02-22) — `https://stranger-alpha-livid.vercel.app`
 
 ### 아직 미구현 (TODO)
 
 #### 우선순위 높음
-- [ ] 프로덕션 배포 (Vercel + Cloud Supabase 실제 배포)
-  - Vercel 환경 변수 설정 및 도메인 연결
-  - Supabase Cloud DB 마이그레이션
-  - Vercel Cron 동작 확인 (expire-matches, no-show, departure-reminder)
-  - 푸시 알림 Web Push VAPID 프로덕션 확인
-  - 전체 기능 QA 테스트
+- [x] ~~프로덕션 배포 (Vercel + Cloud Supabase 실제 배포)~~ — 2026-02-22 완료
+  - [x] Vercel 환경변수 17개 등록 완료
+  - [x] Vercel 프로젝트 연결 및 배포 완료 (`https://stranger-alpha-livid.vercel.app`)
+  - [x] Supabase Cloud DB 마이그레이션 (00028까지 적용)
+  - [x] Vercel Cron 설정 완료 (단, Hobby 플랜 제한으로 일부 임시 변경 — 아래 참조)
+  - [ ] 푸시 알림 Web Push VAPID 프로덕션 동작 확인 (미검증)
+  - [ ] 전체 기능 QA 테스트 (미진행)
+  - [ ] 커스텀 도메인 연결 (현재 vercel.app 기본 도메인)
+- [ ] **[긴급] Vercel Pro 업그레이드 후 크론 주기 복원**
+  - `/api/cron/no-show`: `10 2 * * *` → `*/10 * * * *` (현재 Hobby 플랜 제한으로 임시 daily)
+  - `/api/push/departure-reminder`: `0 8 * * *` → `*/10 * * * *` (동일)
+  - 관련 커밋: `3e9331e`
 - [ ] SMS Provider 연동 (Twilio 등 — 현재 Supabase 테스트 모드)
 - [ ] 이미지 최적화 (`<img>` → `next/image`)
-- [ ] 질문 선택지 DB 다국어 구조 — `questions.option_a/b` 가 DB에 한국어로 저장되어 있어 번역 불가. 별도 translations 테이블 또는 컬럼 추가(`option_a_en`, `option_a_ja`) 필요
+- [x] ~~질문 선택지 DB 다국어 구조~~ — 2026-02-22 완료
+  - `00028_add_question_i18n_columns.sql` 마이그레이션으로 `question_text_en/ja`, `option_a/b_en/ja` 컬럼 추가
+  - `supabase/seed.sql`에 EN/JA 번역 데이터 추가 완료
 
 #### 후순위 — iOS/Android 앱 배포 (프로덕션 배포 완료 후 진행)
 
