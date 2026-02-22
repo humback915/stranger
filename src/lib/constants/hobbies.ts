@@ -21,4 +21,50 @@ export const HOBBIES = [
   "요가/필라테스",
 ] as const;
 
+export const HOBBIES_EN = [
+  "Exercise/Fitness",
+  "Running/Jogging",
+  "Hiking",
+  "Travel",
+  "Food Exploration",
+  "Café Hopping",
+  "Movies",
+  "Reading",
+  "Music",
+  "Playing Instruments",
+  "Cooking/Baking",
+  "Photography",
+  "Gaming",
+  "Pets",
+  "Drawing/Illustration",
+  "Writing",
+  "Dancing",
+  "Camping",
+  "Cycling",
+  "Yoga/Pilates",
+] as const;
+
+export const HOBBIES_JA = [
+  "運動/フィットネス",
+  "ランニング/ジョギング",
+  "登山/ハイキング",
+  "旅行",
+  "グルメ巡り",
+  "カフェ巡り",
+  "映画鑑賞",
+  "読書",
+  "音楽鑑賞",
+  "楽器演奏",
+  "料理/ベーキング",
+  "写真撮影",
+  "ゲーム",
+  "ペット",
+  "絵/イラスト",
+  "文章執筆",
+  "ダンス",
+  "キャンプ",
+  "サイクリング",
+  "ヨガ/ピラティス",
+] as const;
+
 export type Hobby = (typeof HOBBIES)[number];

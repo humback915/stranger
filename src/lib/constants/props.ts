@@ -59,6 +59,92 @@ export const PROP_OPTIONS: Record<PropCategory, string[]> = {
   ],
 };
 
+export const PROP_OPTIONS_EN: Record<PropCategory, string[]> = {
+  clothing_color: [
+    "Red Top",
+    "Blue Top",
+    "Yellow Top",
+    "Green Top",
+    "White Top",
+    "Black Top",
+    "Blue Hat",
+    "Red Hat",
+    "White Sneakers",
+  ],
+  phone_screen: [
+    "Yellow Wallpaper",
+    "Heart Emoji Screen",
+    "Star Emoji Screen",
+    "Blue Wallpaper",
+    "Green Wallpaper",
+  ],
+  convenience_item: [
+    "Banana Milk",
+    "Strawberry Milk",
+    "Blue Gatorade",
+    "Green Umbrella",
+    "Red Umbrella",
+    "Yellow Plastic Bag",
+  ],
+  accessory: [
+    "Wristwatch",
+    "Eco Bag",
+    "Sunglasses",
+    "Scarf",
+    "Baseball Cap",
+    "Beanie",
+  ],
+  book_magazine: [
+    "Any Book",
+    "Today's Newspaper",
+    "Yellow Cover Book",
+    "Blue Cover Book",
+  ],
+};
+
+export const PROP_OPTIONS_JA: Record<PropCategory, string[]> = {
+  clothing_color: [
+    "赤いトップス",
+    "青いトップス",
+    "黄色いトップス",
+    "緑のトップス",
+    "白いトップス",
+    "黒いトップス",
+    "青い帽子",
+    "赤い帽子",
+    "白いスニーカー",
+  ],
+  phone_screen: [
+    "黄色い壁紙",
+    "ハートの絵文字画面",
+    "星の絵文字画面",
+    "青い壁紙",
+    "緑の壁紙",
+  ],
+  convenience_item: [
+    "バナナ牛乳",
+    "イチゴ牛乳",
+    "青いゲータレード",
+    "緑の傘",
+    "赤い傘",
+    "黄色いビニール袋",
+  ],
+  accessory: [
+    "腕時計",
+    "エコバッグ",
+    "サングラス",
+    "マフラー",
+    "野球帽",
+    "ニット帽",
+  ],
+  book_magazine: [
+    "本一冊",
+    "今日の新聞",
+    "黄色い表紙の本",
+    "青い表紙の本",
+  ],
+};
+
 /** 모든 허용된 소품 이름 목록 */
 export const ALL_ALLOWED_PROPS = Object.values(PROP_OPTIONS).flat();
 
@@ -68,4 +154,22 @@ export function isAllowedProp(
 ): boolean {
   if (!PROP_CATEGORIES.includes(category as PropCategory)) return false;
   return PROP_OPTIONS[category as PropCategory].includes(propName);
+}
+
+/** 소품 이름을 로케일에 맞게 변환 */
+export function localizePropName(
+  category: string,
+  propName: string,
+  locale: string
+): string {
+  if (locale === "ko") return propName;
+  const cat = category as PropCategory;
+  if (!PROP_CATEGORIES.includes(cat)) return propName;
+
+  const koList = PROP_OPTIONS[cat];
+  const idx = koList.indexOf(propName);
+  if (idx === -1) return propName;
+
+  const localizedList = locale === "en" ? PROP_OPTIONS_EN[cat] : PROP_OPTIONS_JA[cat];
+  return localizedList[idx] ?? propName;
 }

@@ -1,9 +1,16 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMyMatches } from "@/actions/matching";
 import { ROUTES } from "@/lib/constants/routes";
 
-export default async function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const t = await getTranslations("home");
   const gt = await getTranslations("gender");
   const result = await getMyMatches();

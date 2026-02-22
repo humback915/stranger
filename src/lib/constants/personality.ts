@@ -21,4 +21,50 @@ export const PERSONALITIES = [
   "독립적인",
 ] as const;
 
+export const PERSONALITIES_EN = [
+  "Extroverted",
+  "Introverted",
+  "Humorous",
+  "Calm",
+  "Lively",
+  "Warm",
+  "Honest",
+  "Considerate",
+  "Positive",
+  "Emotional",
+  "Rational",
+  "Adventurous",
+  "Detail-oriented",
+  "Spontaneous",
+  "Leadership",
+  "Good Listener",
+  "Creative",
+  "Diligent",
+  "Optimistic",
+  "Independent",
+] as const;
+
+export const PERSONALITIES_JA = [
+  "外向的",
+  "内向的",
+  "ユーモラス",
+  "穏やか",
+  "活発",
+  "優しい",
+  "正直",
+  "思いやりがある",
+  "ポジティブ",
+  "感情豊か",
+  "理性的",
+  "冒険的",
+  "几帳面",
+  "自由奔放",
+  "リーダーシップがある",
+  "話を聞くのが得意",
+  "クリエイティブ",
+  "誠実",
+  "楽天的",
+  "独立心が強い",
+] as const;
+
 export type Personality = (typeof PERSONALITIES)[number];

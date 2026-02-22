@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { getQuestions } from "@/actions/question";
 import {
@@ -7,7 +8,14 @@ import {
 import { ROUTES } from "@/lib/constants/routes";
 import QuestionsClient from "./QuestionsClient";
 
-export default async function QuestionsPage() {
+export default async function QuestionsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const [questionsResult, myCustomResult, toAnswerResult] = await Promise.all([
     getQuestions(),
     getMyCustomQuestions(),

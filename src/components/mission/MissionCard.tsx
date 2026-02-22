@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { PlaceCategory } from "@/lib/constants/places";
 import type { PropCategory } from "@/lib/constants/props";
+import { localizePropName } from "@/lib/constants/props";
+import { localizeAction } from "@/lib/constants/actions";
 import DepartureConfirmation from "./DepartureConfirmation";
 import MissionMap from "./MissionMap";
 import ReportModal from "@/components/safety/ReportModal";
@@ -42,6 +44,8 @@ export default function MissionCard({ mission, role, partnerNickname, partnerId 
   const t = useTranslations("mission");
   const tPlace = useTranslations("place_categories");
   const tProp = useTranslations("prop_categories");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : locale === "ja" ? "ja-JP" : "ko-KR";
   const placeCategoryLabels: Record<string, string> = {
     cafe: tPlace("cafe"),
     bookstore: tPlace("bookstore"),
@@ -83,10 +87,13 @@ export default function MissionCard({ mission, role, partnerNickname, partnerId 
     : mission.user_a_departure_confirmed;
 
   const formattedDate = new Date(mission.meeting_date).toLocaleDateString(
-    "ko-KR",
+    dateLocale,
     { month: "long", day: "numeric", weekday: "short" }
   );
   const formattedTime = mission.meeting_time.slice(0, 5); // HH:MM
+
+  const localizedPropName = localizePropName(myPropCategory, myPropName, locale);
+  const localizedAction = myAction ? localizeAction(myAction, locale) : null;
 
   return (
     <div className="space-y-4 rounded-2xl bg-stranger-dark p-5">
@@ -155,7 +162,7 @@ export default function MissionCard({ mission, role, partnerNickname, partnerId 
             myPropCategory}
           )
         </p>
-        <p className="text-sm font-medium text-stranger-light">{myPropName}</p>
+        <p className="text-sm font-medium text-stranger-light">{localizedPropName}</p>
         {myPropDesc && (
           <p className="mt-1 text-xs text-gray-400">{myPropDesc}</p>
         )}
@@ -167,10 +174,10 @@ export default function MissionCard({ mission, role, partnerNickname, partnerId 
       </div>
 
       {/* 나의 식별 행동 */}
-      {myAction && (
+      {localizedAction && (
         <div className="rounded-lg bg-stranger-mid px-4 py-3">
           <p className="mb-1 text-xs text-gray-400">{t("my_action")}</p>
-          <p className="text-sm font-medium text-stranger-light">{myAction}</p>
+          <p className="text-sm font-medium text-stranger-light">{localizedAction}</p>
         </div>
       )}
 

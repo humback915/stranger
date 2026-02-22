@@ -75,6 +75,14 @@ export async function middleware(request: NextRequest) {
 
   const { user, supabaseResponse } = await updateSession(request);
 
+  // next-intl이 설정한 로케일 헤더를 supabaseResponse에 복사
+  // (intlMiddleware가 설정한 x-next-intl-locale 헤더가 없으면 Server Components가 항상 ko로 폴백됨)
+  intlResponse.headers.forEach((value, key) => {
+    if (key.startsWith("x-next-intl")) {
+      supabaseResponse.headers.set(key, value);
+    }
+  });
+
   const publicPaths = ["/login", "/verify"];
   const isPublicPath =
     publicPaths.some((path) => pathWithoutLocale === path) ||

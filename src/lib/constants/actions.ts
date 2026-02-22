@@ -12,3 +12,42 @@ export const IDENTIFICATION_ACTIONS = [
   "손목시계를 계속 확인하기",
   "양 발을 까딱까딱 하며 앉아 있기",
 ] as const;
+
+export const IDENTIFICATION_ACTIONS_EN = [
+  "Standing with weight on one leg",
+  "Leaning against a wall with arms crossed",
+  "Hiding a single rose behind your back",
+  "Pretending to read an open book",
+  "Wearing only one earphone",
+  "Tapping the table with your fingers",
+  "Resting your chin in your hand, gazing out the window",
+  "Sitting with both hands cupping your chin",
+  "Holding your phone upright and looking at it",
+  "Tilting your head slightly and smiling",
+  "Repeatedly checking your wristwatch",
+  "Sitting while swinging both feet",
+] as const;
+
+export const IDENTIFICATION_ACTIONS_JA = [
+  "片足重心で立つ",
+  "腕を組んで壁にもたれる",
+  "薔薇の花一本を背中に隠す",
+  "本を開いて読む振りをする",
+  "片方だけイヤホンをつける",
+  "指でテーブルをトントン叩く",
+  "頬杖をついて窓の外を眺める",
+  "両手で顎を包んで座る",
+  "スマホを縦に持って見る",
+  "少し首を傾けて微笑む",
+  "腕時計を何度も確認する",
+  "両足をブラブラさせながら座る",
+] as const;
+
+/** 식별 행동을 로케일에 맞게 변환 (목록에 없는 AI 생성 텍스트는 원문 반환) */
+export function localizeAction(action: string, locale: string): string {
+  if (locale === "ko") return action;
+  const idx = (IDENTIFICATION_ACTIONS as readonly string[]).indexOf(action);
+  if (idx === -1) return action;
+  const list = locale === "en" ? IDENTIFICATION_ACTIONS_EN : IDENTIFICATION_ACTIONS_JA;
+  return list[idx] ?? action;
+}

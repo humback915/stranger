@@ -1,9 +1,11 @@
 "use server";
 
+import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getQuestions() {
   const supabase = createClient();
+  const locale = await getLocale();
 
   const {
     data: { user },
@@ -13,16 +15,34 @@ export async function getQuestions() {
     return { error: "인증되지 않은 사용자입니다" };
   }
 
-  // 활성 질문 전체 조회
-  const { data: questions, error: qError } = await supabase
+  // 활성 질문 전체 조회 (번역 컬럼 포함)
+  const { data: rawQuestions, error: qError } = await supabase
     .from("questions")
-    .select("id, category, question_text, option_a, option_b, weight")
+    .select(
+      "id, category, weight, question_text, question_text_en, question_text_ja, option_a, option_a_en, option_a_ja, option_b, option_b_en, option_b_ja"
+    )
     .eq("is_active", true)
     .order("id");
 
   if (qError) {
     return { error: qError.message };
   }
+
+  // 로케일에 맞는 텍스트로 변환
+  const questions = (rawQuestions ?? []).map((q) => ({
+    id: q.id,
+    category: q.category,
+    weight: q.weight,
+    question_text:
+      (locale === "en" ? q.question_text_en : locale === "ja" ? q.question_text_ja : null) ??
+      q.question_text,
+    option_a:
+      (locale === "en" ? q.option_a_en : locale === "ja" ? q.option_a_ja : null) ??
+      q.option_a,
+    option_b:
+      (locale === "en" ? q.option_b_en : locale === "ja" ? q.option_b_ja : null) ??
+      q.option_b,
+  }));
 
   // 사용자의 기존 답변 조회
   const { data: answers, error: aError } = await supabase
@@ -39,9 +59,9 @@ export async function getQuestions() {
   );
 
   return {
-    questions: questions ?? [],
+    questions,
     answeredMap: Object.fromEntries(answeredMap),
-    totalCount: questions?.length ?? 0,
+    totalCount: questions.length,
     answeredCount: answers?.length ?? 0,
   };
 }

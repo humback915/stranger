@@ -21,4 +21,50 @@ export const IDEAL_TYPES = [
   "동물좋아하는",
 ] as const;
 
+export const IDEAL_TYPES_EN = [
+  "Sense of Humor",
+  "Intellectual",
+  "Warm-hearted",
+  "Honest",
+  "Self-disciplined",
+  "Considerate",
+  "Easy to Talk To",
+  "Positive",
+  "Diligent",
+  "Ambitious",
+  "Emotional",
+  "Reliable",
+  "Lively",
+  "Calm",
+  "Independent",
+  "Family-oriented",
+  "Stylish",
+  "Polite",
+  "Shares Hobbies",
+  "Animal Lover",
+] as const;
+
+export const IDEAL_TYPES_JA = [
+  "ユーモアがある",
+  "知性的",
+  "優しい",
+  "正直",
+  "自己管理できる",
+  "思いやりがある",
+  "話が合う",
+  "ポジティブ",
+  "誠実",
+  "野心がある",
+  "感情豊か",
+  "頼もしい",
+  "活発",
+  "穏やか",
+  "独立心がある",
+  "家庭的",
+  "センスがある",
+  "礼儀正しい",
+  "趣味が合う",
+  "動物好き",
+] as const;
+
 export type IdealType = (typeof IDEAL_TYPES)[number];

@@ -90,8 +90,14 @@ export type Database = {
           id: number;
           category: "values" | "lifestyle" | "romance" | "personality" | "taste";
           question_text: string;
+          question_text_en: string | null;
+          question_text_ja: string | null;
           option_a: string;
+          option_a_en: string | null;
+          option_a_ja: string | null;
           option_b: string;
+          option_b_en: string | null;
+          option_b_ja: string | null;
           weight: number;
           is_active: boolean;
           created_at: string;
@@ -100,8 +106,14 @@ export type Database = {
           id?: number;
           category: "values" | "lifestyle" | "romance" | "personality" | "taste";
           question_text: string;
+          question_text_en?: string | null;
+          question_text_ja?: string | null;
           option_a: string;
+          option_a_en?: string | null;
+          option_a_ja?: string | null;
           option_b: string;
+          option_b_en?: string | null;
+          option_b_ja?: string | null;
           weight?: number;
           is_active?: boolean;
           created_at?: string;
@@ -109,8 +121,14 @@ export type Database = {
         Update: {
           category?: "values" | "lifestyle" | "romance" | "personality" | "taste";
           question_text?: string;
+          question_text_en?: string | null;
+          question_text_ja?: string | null;
           option_a?: string;
+          option_a_en?: string | null;
+          option_a_ja?: string | null;
           option_b?: string;
+          option_b_en?: string | null;
+          option_b_ja?: string | null;
           weight?: number;
           is_active?: boolean;
         };

@@ -1,10 +1,27 @@
 "use client";
 
 import { useState, useTransition, useCallback } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { respondToMatch } from "@/actions/matching";
 import { ROUTES } from "@/lib/constants/routes";
+import { HOBBIES, HOBBIES_EN, HOBBIES_JA } from "@/lib/constants/hobbies";
+import { PERSONALITIES, PERSONALITIES_EN, PERSONALITIES_JA } from "@/lib/constants/personality";
+import { IDEAL_TYPES, IDEAL_TYPES_EN, IDEAL_TYPES_JA } from "@/lib/constants/ideal-type";
+
+function localizeTag(
+  value: string,
+  ko: readonly string[],
+  en: readonly string[],
+  ja: readonly string[],
+  locale: string
+): string {
+  const idx = (ko as readonly string[]).indexOf(value);
+  if (idx === -1) return value;
+  if (locale === "en") return en[idx] ?? value;
+  if (locale === "ja") return ja[idx] ?? value;
+  return value;
+}
 
 interface Partner {
   id: string;
@@ -52,6 +69,8 @@ interface MatchCardProps {
 export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
   const t = useTranslations("matches");
   const gt = useTranslations("gender");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : locale === "ja" ? "ja-JP" : "ko-KR";
   const [status, setStatus] = useState(match.status);
   const [myAccepted, setMyAccepted] = useState<boolean | null>(
     match.role === "user_a" ? match.user_a_accepted : match.user_b_accepted
@@ -157,17 +176,17 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
             <div className="flex flex-wrap gap-1.5 pl-[60px]">
               {partner.hobbies?.map((h) => (
                 <span key={h} className="rounded-md bg-stranger-accent/15 px-2 py-0.5 text-[10px] text-stranger-accent">
-                  {h}
+                  {localizeTag(h, HOBBIES, HOBBIES_EN, HOBBIES_JA, locale)}
                 </span>
               ))}
               {partner.personality?.map((p) => (
                 <span key={p} className="rounded-md bg-purple-500/15 px-2 py-0.5 text-[10px] text-purple-400">
-                  {p}
+                  {localizeTag(p, PERSONALITIES, PERSONALITIES_EN, PERSONALITIES_JA, locale)}
                 </span>
               ))}
-              {partner.ideal_type?.map((t) => (
-                <span key={t} className="rounded-md bg-pink-500/15 px-2 py-0.5 text-[10px] text-pink-400">
-                  {t}
+              {partner.ideal_type?.map((it) => (
+                <span key={it} className="rounded-md bg-pink-500/15 px-2 py-0.5 text-[10px] text-pink-400">
+                  {localizeTag(it, IDEAL_TYPES, IDEAL_TYPES_EN, IDEAL_TYPES_JA, locale)}
                 </span>
               ))}
             </div>
@@ -281,7 +300,7 @@ export default function MatchCard({ match, onStatusChange }: MatchCardProps) {
             {lastMessage.content}
           </p>
           <p className="mt-0.5 text-[10px] text-gray-600">
-            {new Date(lastMessage.created_at).toLocaleString("ko-KR", {
+            {new Date(lastMessage.created_at).toLocaleString(dateLocale, {
               month: "numeric",
               day: "numeric",
               hour: "2-digit",
