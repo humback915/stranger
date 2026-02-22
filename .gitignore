@@ -37,3 +37,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# firebase
+*-firebase-adminsdk-*.json
+
+# local setup docs
+openclaw-macbook-setup.md
