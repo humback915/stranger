@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useCallback } from "react";
+import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { respondToMatch } from "@/actions/matching";
@@ -355,11 +356,12 @@ function PhotoCarousel({ photos }: { photos: string[] }) {
 
   return (
     <div className="relative mb-3 overflow-hidden rounded-xl">
-      <div className="aspect-[4/3] w-full">
-        <img
+      <div className="relative aspect-[4/3] w-full">
+        <Image
           src={photos[current]}
           alt={`photo ${current + 1}`}
-          className="h-full w-full object-cover"
+          fill
+          className="object-cover"
         />
       </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { uploadProfilePhoto, deleteProfilePhoto } from "@/actions/photo";
@@ -121,10 +122,11 @@ export default function PhotosStep() {
       <div className="grid grid-cols-3 gap-3">
         {photos.map((url, index) => (
           <div key={url} className="relative aspect-square">
-            <img
+            <Image
               src={url}
               alt={t("photos_upload")}
-              className="h-full w-full rounded-xl object-cover"
+              fill
+              className="rounded-xl object-cover"
             />
             <button
               type="button"

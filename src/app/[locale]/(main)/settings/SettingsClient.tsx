@@ -11,6 +11,7 @@ import { REGIONS, findArea } from "@/lib/constants/areas";
 import { HOBBIES } from "@/lib/constants/hobbies";
 import { PERSONALITIES } from "@/lib/constants/personality";
 import { IDEAL_TYPES } from "@/lib/constants/ideal-type";
+import Image from "next/image";
 import PhotoEditor from "@/components/profile/PhotoEditor";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -429,10 +430,11 @@ export default function SettingsClient({ profile }: SettingsClientProps) {
           <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
             {currentPhotos.map((url, i) => (
               <div key={url} className="relative h-16 w-16 shrink-0">
-                <img
+                <Image
                   src={url}
                   alt={`사진 ${i + 1}`}
-                  className="h-full w-full rounded-lg object-cover"
+                  fill
+                  className="rounded-lg object-cover"
                 />
                 {i === 0 && (
                   <span className="absolute bottom-0.5 left-0.5 rounded bg-stranger-accent/90 px-1 py-0.5 text-[8px] text-white">
